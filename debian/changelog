@@ -1,3 +1,26 @@
+libconfig (1.5-0.4) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * debian/rules:
+    + Bump shlibs version to cater for new symbols added when building
+      with GCC 7.  Closes: #853517
+    + Don't compress a 4.1 KB example file.  Closes: #717954
+  * debian/watch: rewrite pointing to github.  Closes: #825964
+  * debian/control:
+    + Drop transitional packages libconfig8-dev and libconfig++8-dev.
+      Closes: #878652
+    + Drop build-depends on g++, implied by build-essential and the version
+      requested is already old enough.
+    + Bump Standards-Version to 4.1.1, no changes needed.
+    + Mark libconfig-doc as Multi-Arch: foreign.
+  * Bump debhelper compat level to 10:
+    + Drop --parallel, now default.
+    + Drop --with autoreconf, now default (also drop the build-dep).
+  * Drop *-dbg packages in favour of automatic debug packages.
+  * debian/shlibs: remove, it only contains default stuff.
+
+ -- Mattia Rizzolo <mattia@debian.org>  Fri, 10 Nov 2017 21:29:25 +0100
+
 libconfig (1.5-0.3) unstable; urgency=medium
 
   * Non-maintainer upload.
@@ -70,7 +93,7 @@ libconfig (1.4.8-4) unstable; urgency=low
     - Set section as oldlibs
     - Set priority as extra
     - Remove package descriptions
-  * Add Multiarch support 
+  * Add Multiarch support
 
  -- Jonathan McCrohan <jmccrohan@gmail.com>  Fri, 06 Apr 2012 14:28:39 +0100
 
@@ -115,7 +138,7 @@ libconfig (1.4.8-1~exp1) experimental; urgency=low
 libconfig (1.3.2-2) unstable; urgency=low
 
   * Removed "conflicts" with older sonames (Closes: #536635)
-  * Added missing compile-time libconfig++8-dev dependencies 
+  * Added missing compile-time libconfig++8-dev dependencies
     (libconfig8-dev) (Closes: #537311)
 
   * Removed libtool's ".la" files (clients should use pkg-config)
