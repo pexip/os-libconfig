@@ -1,11 +1,13 @@
 Source: libconfig
 Priority: optional
-Maintainer: Jonathan McCrohan <jmccrohan@gmail.com>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Jonathan McCrohan <jmccrohan@gmail.com>
 Build-Depends: debhelper (>= 9), dh-autoreconf, texinfo, g++ (>= 4:5)
 Build-Depends-Indep: texlive-latex-base, texlive-fonts-recommended
 Standards-Version: 3.9.6
 Homepage: http://www.hyperrealm.com/libconfig/
 Section: libs
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
 
 Package: libconfig9
 Architecture: any
