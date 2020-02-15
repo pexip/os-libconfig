@@ -7,7 +7,7 @@ Build-Depends-Indep: texlive-latex-base, texlive-fonts-recommended
 Standards-Version: 3.9.6
 Homepage: http://www.hyperrealm.com/libconfig/
 Section: libs
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ stretch
+XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
 
 Package: libconfig9
 Architecture: any
