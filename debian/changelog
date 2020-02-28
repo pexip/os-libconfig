@@ -1,3 +1,9 @@
+libconfig (1.5-0.4pexip1) pexip; urgency=medium
+
+  * Migrate to Buster
+
+ -- Vincent Sanders <vince@pexip.com>  Fri, 28 Feb 2020 23:00:46 +0000
+
 libconfig (1.5-0.4) unstable; urgency=medium
 
   * Non-maintainer upload.
