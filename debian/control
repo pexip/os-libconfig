@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 10), texinfo
 Build-Depends-Indep: texlive-latex-base, texlive-fonts-recommended
 Standards-Version: 4.1.1
 Homepage: http://www.hyperrealm.com/libconfig/
-XS-Pexip-Upstream: http://ftp.debian.org/debian/ buster
+XS-Pexip-Upstream: http://deb.debian.org/debian/ bullseye
 
 Package: libconfig9
 Architecture: any
