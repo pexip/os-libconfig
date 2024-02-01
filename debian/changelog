@@ -1,3 +1,9 @@
+libconfig (1.5-0.4+pexip24u8) pexip-bookworm; urgency=medium
+
+  * New versioning scheme
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Thu, 01 Feb 2024 16:04:14 +0000
+
 libconfig (1.5-0.4pexip7) pexip-bookworm; urgency=medium
 
   * Bookworm build for product distribution
