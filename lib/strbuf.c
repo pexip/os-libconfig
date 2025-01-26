@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
-   Copyright (C) 2005-2014  Mark A Lindner
+   Copyright (C) 2005-2020  Mark A Lindner
 
    This file is part of libconfig.
 
@@ -21,6 +21,7 @@
 */
 
 #include "strbuf.h"
+#include "util.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -29,29 +30,45 @@
 
 /* ------------------------------------------------------------------------- */
 
-char *strbuf_release(strbuf_t *buf)
-{
-  char *r = buf->string;
-  memset(buf, 0, sizeof(strbuf_t));
-  return(r);
-}
-
-/* ------------------------------------------------------------------------- */
-
-void strbuf_append(strbuf_t *buf, const char *text)
+void libconfig_strbuf_ensure_capacity(strbuf_t *buf, size_t len)
 {
   static const size_t mask = ~(STRING_BLOCK_SIZE - 1);
-  size_t len = strlen(text);
-  size_t newlen = buf->length + len + 1; /* add 1 for NUL */
 
+  size_t newlen = buf->length + len + 1; /* add 1 for NUL */
   if(newlen > buf->capacity)
   {
     buf->capacity = (newlen + (STRING_BLOCK_SIZE - 1)) & mask;
     buf->string = (char *)realloc(buf->string, buf->capacity);
   }
+}
 
-  strcpy(buf->string + buf->length, text);
+/* ------------------------------------------------------------------------- */
+
+char *libconfig_strbuf_release(strbuf_t *buf)
+{
+  char *r = buf->string;
+  __zero(buf);
+  return(r);
+}
+
+/* ------------------------------------------------------------------------- */
+
+void libconfig_strbuf_append_string(strbuf_t *buf, const char *s)
+{
+  size_t len = strlen(s);
+  libconfig_strbuf_ensure_capacity(buf, len);
+  strcpy(buf->string + buf->length, s);
   buf->length += len;
+}
+
+/* ------------------------------------------------------------------------- */
+
+void libconfig_strbuf_append_char(strbuf_t *buf, char c)
+{
+  libconfig_strbuf_ensure_capacity(buf, 1);
+  *(buf->string + buf->length) = c;
+  ++(buf->length);
+  *(buf->string + buf->length) = '\0';
 }
 
 /* ------------------------------------------------------------------------- */

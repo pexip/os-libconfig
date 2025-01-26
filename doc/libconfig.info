@@ -1,4 +1,4 @@
-This is libconfig.info, produced by makeinfo version 5.1 from
+This is libconfig.info, produced by makeinfo version 6.1 from
 libconfig.texi.
 
 INFO-DIR-SECTION Software libraries
@@ -19,8 +19,9 @@ libconfig
 * The C API::
 * The C++ API::
 * Example Programs::
-* Configuration File Grammar::
+* Other Bindings and Implementations::
 * License::
+* Configuration File Grammar::
 * Function Index::
 * Type Index::
 * Concept Index::
@@ -41,9 +42,10 @@ File: libconfig.info,  Node: Introduction,  Next: Configuration Files,  Prev: To
 1 Introduction
 **************
 
-Libconfig is a library for reading, manipulating, and writing structured
-configuration files.  The library features a fully reentrant parser and
-includes bindings for both the C and C++ programming languages.
+   Libconfig is a library for reading, manipulating, and writing
+structured configuration files.  The library features a fully reentrant
+parser and includes bindings for both the C and C++ programming
+languages.
 
    The library runs on modern POSIX-compilant systems, such as Linux,
 Solaris, and Mac OS X (Darwin), as well as on Microsoft Windows 2000/XP
@@ -56,8 +58,8 @@ File: libconfig.info,  Node: Why Another Configuration File Library?,  Next: Usi
 1.1 Why Another Configuration File Library?
 ===========================================
 
-There are several open-source configuration file libraries available as
-of this writing.  This library was written because each of those
+   There are several open-source configuration file libraries available
+as of this writing.  This library was written because each of those
 libraries falls short in one or more ways.  The main features of
 libconfig that set it apart from the other libraries are:
 
@@ -83,7 +85,7 @@ File: libconfig.info,  Node: Using the Library from a C Program,  Next: Using th
 1.2 Using the Library from a C Program
 ======================================
 
-To use the library from C code, include the following preprocessor
+   To use the library from C code, include the following preprocessor
 directive in your source files:
 
 
@@ -98,7 +100,7 @@ File: libconfig.info,  Node: Using the Library from a C++ Program,  Next: Multit
 1.3 Using the Library from a C++ Program
 ========================================
 
-To use the library from C++, include the following preprocessor
+   To use the library from C++, include the following preprocessor
 directive in your source files:
 
 
@@ -124,10 +126,10 @@ File: libconfig.info,  Node: Multithreading Issues,  Next: Internationalization 
 1.4 Multithreading Issues
 =========================
 
-Libconfig is fully "reentrant"; the functions in the library do not make
-use of global variables and do not maintain state between successive
-calls.  Therefore two independent configurations may be safely
-manipulated concurrently by two distinct threads.
+   Libconfig is fully "reentrant"; the functions in the library do not
+make use of global variables and do not maintain state between
+successive calls.  Therefore two independent configurations may be
+safely manipulated concurrently by two distinct threads.
 
    Libconfig is not "thread-safe".  The library is not aware of the
 presence of threads and knows nothing about the host system's threading
@@ -155,7 +157,7 @@ File: libconfig.info,  Node: Internationalization Issues,  Next: Compiling Using
 1.5 Internationalization Issues
 ===============================
 
-Libconfig does not natively support Unicode configuration files, but
+   Libconfig does not natively support Unicode configuration files, but
 string values may contain Unicode text encoded in UTF-8; such strings
 will be treated as ordinary 8-bit ASCII text by the library.  It is the
 responsibility of the calling program to perform the necessary
@@ -184,7 +186,7 @@ File: libconfig.info,  Node: Compiling Using pkg-config,  Next: Version Test Mac
 1.6 Compiling Using pkg-config
 ==============================
 
-On UNIX systems you can use the pkg-config utility (version 0.20 or
+   On UNIX systems you can use the pkg-config utility (version 0.20 or
 later) to automatically select the appropriate compiler and linker
 switches for libconfig.  Ensure that the environment variable
 'PKG_CONFIG_PATH' contains the absolute path to the 'lib/pkgconfig'
@@ -222,7 +224,7 @@ File: libconfig.info,  Node: Version Test Macros,  Prev: Compiling Using pkg-con
 1.7 Version Test Macros
 =======================
 
-The 'libconfig.h' header declares the following macros:
+   The 'libconfig.h' header declares the following macros:
 
  -- Macro: LIBCONFIG_VER_MAJOR
  -- Macro: LIBCONFIG_VER_MINOR
@@ -270,7 +272,7 @@ File: libconfig.info,  Node: Configuration Files,  Next: The C API,  Prev: Intro
 2 Configuration Files
 *********************
 
-Libconfig supports structured, hierarchical configurations.  These
+   Libconfig supports structured, hierarchical configurations.  These
 configurations can be read from and written to files and manipulated in
 memory.
 
@@ -303,7 +305,7 @@ file grammar.
          pos = { x = 350; y = 250; };
        };
 
-       list = ( ( "abc", 123, true ), 1.234, ( /* an empty list */) );
+       list = ( ( "abc", 123, true ), 1.234, ( /* an empty list */ ) );
 
        books = ( { title  = "Treasure Island";
                    author = "Robert Louis Stevenson";
@@ -319,7 +321,8 @@ file grammar.
          pi = 3.141592654;
          bigint = 9223372036854775807L;
          columns = [ "Last Name", "First Name", "MI" ];
-         bitmask = 0x1FC3;
+         bitmask = 0x1FC3;	// hex
+         umask = 0027;	// octal. Range limited to that of "int"
        };
      };
 
@@ -352,9 +355,9 @@ characters, dashes ('-'), underscores ('_'), and asterisks ('*'), and
 must begin with a letter or asterisk.  No other characters are allowed.
 
    In C and C++, integer, 64-bit integer, floating point, and string
-values are mapped to the types 'int', 'long long', 'double', and 'const
-char *', respectively.  The boolean type is mapped to 'int' in C and
-'bool' in C++.
+values are mapped to the native types 'int', 'long long', 'double', and
+'const char *', respectively.  The boolean type is mapped to 'int' in C
+and 'bool' in C++.
 
    The following sections describe the elements of the configuration
 file grammar in additional detail.
@@ -365,7 +368,7 @@ File: libconfig.info,  Node: Settings,  Next: Groups,  Up: Configuration Files
 2.1 Settings
 ============
 
-A setting has the form:
+   A setting has the form:
 
    name = value ;
 
@@ -383,7 +386,7 @@ File: libconfig.info,  Node: Groups,  Next: Arrays,  Prev: Settings,  Up: Config
 2.2 Groups
 ==========
 
-A group has the form:
+   A group has the form:
 
    { settings ...  }
 
@@ -396,12 +399,15 @@ File: libconfig.info,  Node: Arrays,  Next: Lists,  Prev: Groups,  Up: Configura
 2.3 Arrays
 ==========
 
-An array has the form:
+   An array has the form:
 
    [ value, value ...  ]
 
    An array may have zero or more elements, but the elements must all be
 scalar values of the same type.
+
+   The last element in an array may be followed by a comma, which will
+be ignored.
 
 
 File: libconfig.info,  Node: Lists,  Next: Integer Values,  Prev: Arrays,  Up: Configuration Files
@@ -409,12 +415,15 @@ File: libconfig.info,  Node: Lists,  Next: Integer Values,  Prev: Arrays,  Up: C
 2.4 Lists
 =========
 
-A list has the form:
+   A list has the form:
 
    ( value, value ...  )
 
    A list may have zero or more elements, each of which can be a scalar
 value, an array, a group, or another list.
+
+   The last element in a list may be followed by a comma, which will be
+ignored.
 
 
 File: libconfig.info,  Node: Integer Values,  Next: 64-bit Integer Values,  Prev: Lists,  Up: Configuration Files
@@ -422,11 +431,12 @@ File: libconfig.info,  Node: Integer Values,  Next: 64-bit Integer Values,  Prev
 2.5 Integer Values
 ==================
 
-Integers can be represented in one of two ways: as a series of one or
+   Integers can be represented in one of two ways: as a series of one or
 more decimal digits ('0' - '9'), with an optional leading sign character
 ('+' or '-'); or as a hexadecimal value consisting of the characters
 '0x' followed by a series of one or more hexadecimal digits ('0' - '9',
-'A' - 'F', 'a' - 'f').
+'A' - 'F', 'a' - 'f').  Additionally, octal notation integers (that is,
+those having a leading zero with non-zero value) are also allowed.
 
 
 File: libconfig.info,  Node: 64-bit Integer Values,  Next: Floating Point Values,  Prev: Integer Values,  Up: Configuration Files
@@ -434,9 +444,22 @@ File: libconfig.info,  Node: 64-bit Integer Values,  Next: Floating Point Values
 2.6 64-bit Integer Values
 =========================
 
-Long long (64-bit) integers are represented identically to integers,
+   Long long (64-bit) integers are represented identically to integers,
 except that an 'L' character is appended to indicate a 64-bit value.
-For example, '0L' indicates a 64-bit integer value 0.
+For example, '0L' indicates a 64-bit integer value 0.  As of version 1.5
+of the library, the trailing 'L' is optional; if the integer value
+exceeds the range of a 32-bit integer, it will automatically be
+interpreted as a 64-bit integer.
+
+   The integer and 64-bit integer setting types are interchangeable to
+the extent that a conversion between the corresponding native types
+would not result in an overflow or underflow.  For example, a long long
+value can be written to a setting that has an integer type, if that
+value is within the range of an int.  This rule applies to every API
+function or method that reads a value from or writes a value to a
+setting: if the type conversion would not result in an overflow or
+underflow, then the call will succeed, and otherwise it will fail.  This
+behavior was not well-defined prior to version 1.7 of the library.
 
 
 File: libconfig.info,  Node: Floating Point Values,  Next: Boolean Values,  Prev: 64-bit Integer Values,  Up: Configuration Files
@@ -444,7 +467,7 @@ File: libconfig.info,  Node: Floating Point Values,  Next: Boolean Values,  Prev
 2.7 Floating Point Values
 =========================
 
-Floating point values consist of a series of one or more digits, one
+   Floating point values consist of a series of one or more digits, one
 decimal point, an optional leading sign character ('+' or '-'), and an
 optional exponent.  An exponent consists of the letter 'E' or 'e', an
 optional sign character, and a series of one or more digits.
@@ -455,8 +478,8 @@ File: libconfig.info,  Node: Boolean Values,  Next: String Values,  Prev: Floati
 2.8 Boolean Values
 ==================
 
-Boolean values may have one of the following values: 'true', 'false', or
-any mixed-case variation thereof.
+   Boolean values may have one of the following values: 'true', 'false',
+or any mixed-case variation thereof.
 
 
 File: libconfig.info,  Node: String Values,  Next: Comments,  Prev: Boolean Values,  Up: Configuration Files
@@ -464,7 +487,7 @@ File: libconfig.info,  Node: String Values,  Next: Comments,  Prev: Boolean Valu
 2.9 String Values
 =================
 
-String values consist of arbitrary text delimited by double quotes.
+   String values consist of arbitrary text delimited by double quotes.
 Literal double quotes can be escaped by preceding them with a backslash:
 '\"'.  The escape sequences '\\', '\f', '\n', '\r', and '\t' are also
 recognized, and have the usual meaning.
@@ -494,7 +517,7 @@ File: libconfig.info,  Node: Comments,  Next: Include Directives,  Prev: String 
 2.10 Comments
 =============
 
-Three types of comments are allowed within a configuration:
+   Three types of comments are allowed within a configuration:
 
    * Script-style comments.  All text beginning with a '#' character to
      the end of the line is ignored.
@@ -519,17 +542,25 @@ File: libconfig.info,  Node: Include Directives,  Prev: Comments,  Up: Configura
 2.11 Include Directives
 =======================
 
-A configuration file may "include" the contents of another file using an
-include directive.  This directive has the effect of inlining the
-contents of the named file at the point of inclusion.
+   A configuration file may "include" the contents of other files using
+an include directive.  This directive has the effect of inlining the
+contents of the named file(s) at the point of inclusion.
 
    An include directive must appear on its own line in the input.  It
 has the form:
 
-   @include "filename"
+   @include "path"
 
-   Any backslashes or double quotes in the filename must be escaped as
-'\\' and '\"', respectively.
+   The interpretation of path depends on the currently registered
+include function.  The default include function prepends the include
+directory, if any, to path, and then interprets the result as a single,
+literal file path.  The application may supply its own include function
+which does variable substitution, wildcard expansion, or other
+transformations, returning a list of zero or more paths to files whose
+contents should be inlined at the point of inclusion.
+
+   Any backslashes or double quotes in the path must be escaped as '\\'
+and '\"', respectively.
 
    For example, consider the following two configuration files:
 
@@ -547,8 +578,18 @@ has the form:
        country = "UK";
      };
 
+   The resulting configuration will be equivalent to one in which the
+contents of the file 'quote.cfg' appeared at the point where the include
+directive is placed.
+
    Include files may be nested to a maximum of 10 levels; exceeding this
 limit results in a parse error.
+
+   When the path argument to an @include directive is a relative path,
+then it will be interpreted as being relative to the include directory
+that has been been set by means of 'config_set_include_dir()'.  If no
+include directory has been set, then it will be taken as being relative
+to the program's current working directory.
 
    Like comments, include directives are not part of the configuration
 file syntax.  They are processed before the configuration itself is
@@ -562,9 +603,9 @@ File: libconfig.info,  Node: The C API,  Next: The C++ API,  Prev: Configuration
 3 The C API
 ***********
 
-This chapter describes the C library API. The type config_t represents a
-configuration, and the type config_setting_t represents a configuration
-setting.
+   This chapter describes the C library API. The type config_t
+represents a configuration, and the type config_setting_t represents a
+configuration setting.
 
    The boolean values 'CONFIG_TRUE' and 'CONFIG_FALSE' are macros
 defined as '(1)' and '(0)', respectively.
@@ -581,6 +622,14 @@ defined as '(1)' and '(0)', respectively.
      'config_destroy()' destroys the configuration CONFIG, deallocating
      all memory associated with the configuration, but does not attempt
      to deallocate the config_t structure itself.
+
+ -- Function: void config_clear (config_t * CONFIG)
+
+     Since v1.7
+
+     This function clears the configuration CONFIG.  All child settings
+     of the root setting are recursively destroyed.  All other
+     attributes of the configuration are left unchanged.
 
  -- Function: int config_read (config_t * CONFIG, FILE * STREAM)
 
@@ -661,10 +710,83 @@ defined as '(1)' and '(0)', respectively.
      'config_get_include_dir()' returns the current include directory
      for the configuration CONFIG, or 'NULL' if none is set.
 
- -- Function: void config_set_options (config_t *CONFIG, int OPTIONS)
- -- Function: int config_get_options (config_t *CONFIG)
+ -- Function: void config_set_include_func (config_include_fn_t FUNC)
 
-     These functions set and get the options for the configuration
+     Since v1.7
+
+     Specifies the include function FUNC to use when processing include
+     directives.  If FUNC is 'NULL', the default include function,
+     'config_default_include_func()', will be reinstated.
+
+     The type config_include_fn_t is a type alias for a function whose
+     signature is:
+
+      -- Function: const char ** func (config_t *CONFIG,
+               const char *INCLUDE_DIR, const char *PATH,
+               const char **ERROR)
+
+          The function receives the configuration CONFIG, the
+          configuration's current include directory INCLUDE_DIR, the
+          argument to the include directive PATH; and a pointer at which
+          to return an error message ERROR.
+
+          On success, the function should return a 'NULL'-terminated
+          array of paths.  Any relative paths must be relative to the
+          program's current working directory.  The contents of these
+          files will be inlined at the point of inclusion, in the order
+          that the paths appear in the array.  Both the array and its
+          elements should be heap allocated; the library will take
+          ownership of and eventually free the strings in the array and
+          the array itself.
+
+          On failure, the function should return 'NULL' and set *ERROR
+          to a static error string which should be used as the parse
+          error for the configuration; the library does not take
+          ownership of or free this string.
+
+          The default include function, 'config_default_include_func()',
+          simply returns a 'NULL'-terminated array containing either a
+          copy of PATH if it's an absolute path, or a concatenation of
+          INCLUDE_DIR and PATH if it's a relative path.
+
+     Application-supplied include functions can perform custom tasks
+     like wildcard expansion or variable substitution.  For example,
+     consider the include directive:
+
+          @include "configs/*.cfg"
+
+     The include function would be invoked with the path 'configs/*.cfg'
+     and could do wildcard expansion on that path, returning a list of
+     paths to files with the file extension '.cfg' in the subdirectory
+     'configs'.  Each of these files would then be inlined at the
+     location of the include directive.
+
+     Tasks like wildcard expansion and variable substitution are
+     non-trivial to implement and typically require platform-specific
+     code.  In the interests of keeping the library as compact and
+     platform-independent as possible, implementations of such include
+     functions are not included.
+
+ -- Function: unsigned short
+          config_get_float_precision(config_t *CONFIG)
+ -- Function: void config_set_float_precision(config_t *CONFIG,
+          unsigned short DIGITS)
+
+     Since v1.6
+
+     These functions get and set the number of decimal digits to output
+     after the radix character when writing the configuration to a file
+     or stream.
+
+     Valid values for DIGITS range from 0 (no decimals) to about 15
+     (implementation defined).  This parameter has no effect on parsing.
+
+     The default float precision is 6.
+
+ -- Function: int config_get_options (config_t *CONFIG)
+ -- Function: void config_set_options (config_t *CONFIG, int OPTIONS)
+
+     These functions get and set the options for the configuration
      CONFIG.  The options affect how configurations are read and
      written.  The following options are defined:
 
@@ -707,30 +829,61 @@ defined as '(1)' and '(0)', respectively.
           be written at the end of the previous line.  By default this
           option is turned on.
 
- -- Function: void config_set_auto_convert (config_t *CONFIG, int FLAG)
+     'CONFIG_OPTION_ALLOW_SCIENTIFIC_NOTATION'
+          (Since v1.7) This option controls whether scientific notation
+          may be used as appropriate when writing floating point values
+          (corresponding to 'printf()' '%g' format) or should never be
+          used (corresponding to 'printf()' '%f' format).  By default
+          this option is turned off.
+
+     'CONFIG_OPTION_FSYNC'
+          (Since v1.7.1) This option controls whether the
+          'config_write_file()' function performs an fsync operation
+          after writing the configuration and before closing the file.
+          By default this option is turned off.
+
+     'CONFIG_OPTION_ALLOW_OVERRIDES'
+          (Since v1.7.3) This option controls whether duplicate settings
+          override previous settings with the same name.  If this option
+          is turned off, duplicate settings are rejected.  By default
+          this option is turned off.
+
+ -- Function: int config_get_option (config_t *CONFIG, int OPTION)
+ -- Function: void config_set_option (config_t *CONFIG, int OPTION,
+          int FLAG)
+
+     Since v1.7
+
+     These functions get and set the given OPTION of the configuration
+     CONFIG.  The option is enabled if FLAG is 'CONFIG_TRUE' and
+     disabled if it is 'CONFIG_FALSE'.
+
+     See 'config_set_options()' above for the list of available options.
+
  -- Function: int config_get_auto_convert (const config_t *CONFIG)
+ -- Function: void config_set_auto_convert (config_t *CONFIG, int FLAG)
 
      These functions get and set the 'CONFIG_OPTION_AUTO_CONVERT'
-     option.  They are obsoleted by the 'config_set_options()' and
-     'config_get_options()' functions described above.
+     option.  They are obsoleted by the 'config_set_option()' and
+     'config_get_option()' functions described above.
 
+ -- Function: short config_get_default_format (config_t * CONFIG)
  -- Function: void config_set_default_format (config_t * CONFIG,
           short FORMAT)
- -- Function: short config_get_default_format (config_t * CONFIG)
 
-     These functions, which are implemented as macros, set and get the
+     These functions, which are implemented as macros, get and set the
      default external format for settings in the configuration CONFIG.
      If a non-default format has not been set for a setting with
      'config_setting_set_format()', this configuration-wide default
      format will be used instead when that setting is written to a file
      or stream.
 
- -- Function: void config_set_tab_width (config_t * CONFIG,
-          unsigned short WIDTH)
  -- Function: unsigned short config_get_tab_width
           (const config_t * CONFIG)
+ -- Function: void config_set_tab_width (config_t * CONFIG,
+          unsigned short WIDTH)
 
-     These functions, which are implemented as macros, set and get the
+     These functions, which are implemented as macros, get and set the
      tab width for the configuration CONFIG.  The tab width affects the
      formatting of the configuration when it is written to a file or
      stream: each level of nesting is indented by WIDTH spaces, or by a
@@ -941,6 +1094,10 @@ defined as '(1)' and '(0)', respectively.
      parent setting PARENT, which must be a group.  Any child settings
      of the setting are recursively destroyed as well.
 
+     The NAME parameter can also specify a setting path relative to the
+     provided PARENT.  (In that case, the setting will be looked up and
+     removed.)
+
      The function returns 'CONFIG_TRUE' on success.  If PARENT is not a
      group, or if it has no setting with the given name, it returns
      'CONFIG_FALSE'.
@@ -960,8 +1117,8 @@ defined as '(1)' and '(0)', respectively.
  -- Function: config_setting_t * config_root_setting
           (const config_t * CONFIG)
 
-     This function returns the root setting for the configuration
-     CONFIG.  The root setting is a group.
+     This function, which is implemented as a macro, returns the root
+     setting for the configuration CONFIG.  The root setting is a group.
 
  -- Function: const char * config_setting_name
           (const config_setting_t * SETTING)
@@ -1023,12 +1180,12 @@ defined as '(1)' and '(0)', respectively.
  -- Function: int config_setting_is_number
           (const config_setting_t * SETTING)
 
-     These convenience functions, which are implemented as macros, test
-     if the setting SETTING is of an aggregate type (a group, array, or
-     list), of a scalar type (integer, 64-bit integer, floating point,
-     boolean, or string), and of a number (integer, 64-bit integer, or
-     floating point), respectively.  They return 'CONFIG_TRUE' or
-     'CONFIG_FALSE'.
+     These convenience functions, some of which are implemented as
+     macros, test if the setting SETTING is of an aggregate type (a
+     group, array, or list), of a scalar type (integer, 64-bit integer,
+     floating point, boolean, or string), and of a number (integer,
+     64-bit integer, or floating point), respectively.  They return
+     'CONFIG_TRUE' or 'CONFIG_FALSE'.
 
  -- Function: const char * config_setting_source_file
           (const config_setting_t * SETTING)
@@ -1047,6 +1204,15 @@ defined as '(1)' and '(0)', respectively.
      stream at which the setting SETTING was read, or 0 if no line
      number is available.  This information is useful for reporting
      application-level errors.
+
+ -- Function: void config_set_hook (config_t * CONFIG, void * HOOK)
+ -- Function: void * config_get_hook (const config_t * CONFIG)
+
+     Since v1.7
+
+     These functions make it possible to attach arbitrary data to a
+     configuration structure, for instance a "wrapper" or "peer" object
+     written in another programming language.
 
  -- Function: void config_setting_set_hook (config_setting_t * SETTING,
           void * HOOK)
@@ -1074,7 +1240,7 @@ File: libconfig.info,  Node: The C++ API,  Next: Example Programs,  Prev: The C 
 4 The C++ API
 *************
 
-This chapter describes the C++ library API. The class 'Config'
+   This chapter describes the C++ library API. The class 'Config'
 represents a configuration, and the class 'Setting' represents a
 configuration setting.  Note that by design, neither of these classes
 provides a public copy constructor or assignment operator.  Therefore,
@@ -1134,10 +1300,10 @@ reading/writing a configuration from/to a file.
 'SettingNameException' all extend the common base exception
 'SettingException', which provides the following method:
 
- -- Method on SettingException: const char * getPath ()
+ -- Method on SettingException: const char * getPath () const
 
-     Returns the path to the setting associated with the exception, or
-     'NULL' if there is no applicable path.
+     This method returns the path to the setting associated with the
+     exception, or 'NULL' if there is no applicable path.
 
    The remainder of this chapter describes the methods for manipulating
 configurations and configuration settings.
@@ -1147,8 +1313,16 @@ configurations and configuration settings.
 
      These methods create and destroy 'Config' objects.
 
+ -- Method on Config: void clear ()
+
+     Since v1.7
+
+     This method clears the configuration.  All child settings of the
+     root setting are recursively destroyed.  All other attributes of
+     the configuration are left unchanged.
+
  -- Method on Config: void read (FILE * STREAM)
- -- Method on Config: void write (FILE * STREAM)
+ -- Method on Config: void write (FILE * STREAM) const
 
      The 'read()' method reads and parses a configuration from the given
      STREAM.  A 'ParseException' is thrown if a parse error occurs.
@@ -1156,11 +1330,14 @@ configurations and configuration settings.
      The 'write()' method writes the configuration to the given STREAM.
 
  -- Method on Config: void readFile (const char * FILENAME)
- -- Method on Config: void writeFile (const char * FILENAME)
+ -- Method on Config: void readFile (const std::string &FILENAME)
 
      The 'readFile()' method reads and parses a configuration from the
      file named FILENAME.  A 'ParseException' is thrown if a parse error
      occurs.  A 'FileIOException' is thrown if the file cannot be read.
+
+ -- Method on Config: void writeFile (const char * FILENAME)
+ -- Method on Config: void writeFile (const std::string &FILENAME)
 
      The 'writeFile()' method writes the configuration to the file named
      FILENAME.  A 'FileIOException' is thrown if the file cannot be
@@ -1172,9 +1349,9 @@ configurations and configuration settings.
      These methods read and parse a configuration from the string STR.
      A 'ParseException' is thrown if a parse error occurs.
 
- -- Method on ParseException: const char * getError ()
- -- Method on ParseException: const char * getFile ()
- -- Method on ParseException: int getLine ()
+ -- Method on ParseException: const char * getError () const
+ -- Method on ParseException: const char * getFile () const
+ -- Method on ParseException: int getLine () const
 
      If a call to 'readFile()', 'readString()', or 'read()' resulted in
      a 'ParseException', these methods can be called on the exception
@@ -1184,14 +1361,14 @@ configurations and configuration settings.
      freed by the caller.
 
  -- Method on Config: void setIncludeDir (const char *INCLUDEDIR)
- -- Method on Config: const char * getIncludeDir ()
+ -- Method on Config: const char * getIncludeDir () const
 
-     'setIncludeDir()' specifies the include directory, INCLUDEDIR,
-     relative to which the files specified in '@include' directives will
-     be located for the configuration.  By default, there is no include
-     directory, and all include files are expected to be relative to the
-     current working directory.  If INCLUDEDIR is 'NULL', the default
-     behavior is reinstated.
+     The 'setIncludeDir()' method specifies the include directory,
+     INCLUDEDIR, relative to which the files specified in '@include'
+     directives will be located for the configuration.  By default,
+     there is no include directory, and all include files are expected
+     to be relative to the current working directory.  If INCLUDEDIR is
+     'NULL', the default behavior is reinstated.
 
      For example, if the include directory is set to '/usr/local/etc',
      the include directive '@include "configs/extra.cfg"' would include
@@ -1200,14 +1377,45 @@ configurations and configuration settings.
      'getIncludeDir()' returns the current include directory for the
      configuration, or 'NULL' if none is set.
 
+ -- Method on Config: virtual const char ** evaluateIncludePath
+          (const char * PATH, const char ** ERROR)
+
+     Since v1.7
+
+     This method is called to evaluate the path of an '@include'
+     directive.  The PATH is the literal path argument of the directive.
+     The method may be overridden in a subclass to perform tasks like
+     wildcard expansion and variable substitution.
+
+     On success, the method should return a 'NULL'-terminated array of
+     paths.  Any relative paths must be relative to the program's
+     current working directory.  The contents of these files will be
+     inlined at the point of inclusion, in the order that the paths
+     appear in the array.  Both the array and its elements should be
+     heap allocated; the library will take ownership of and eventually
+     free the strings in the array and the array itself.
+
+     On failure, the function should return 'NULL' and set *ERROR to a
+     static error string which should be used as the parse error for the
+     configuration; the library does not take ownership of or free this
+     string.
+
+     The default implementation simply returns a 'NULL'-terminated array
+     containing either a copy of PATH if it's an absolute path, or a
+     concatenation of the include directory and PATH if it's a relative
+     path.
+
+     For more information see 'config_set_include_func()' above.
+
+ -- Method on Config: int getOptions () const
  -- Method on Config: void setOptions (int OPTIONS)
- -- Method on Config: int getOptions ()
 
-     These methods set and get the options for the configuration.  The
+     These methods get and set the options for the configuration.  The
      options affect how configurations are read and written.  The
-     following options are defined:
+     parameter OPTIONS should be a bitwise-OR of the following
+     CONFIG::OPTION enumeration values:
 
-     'OptionAutoConvert'
+     'Config::OptionAutoConvert'
           Turning this option on enables number auto-conversion for the
           configuration.  When this feature is enabled, an attempt to
           retrieve a floating point setting's value into an integer (or
@@ -1217,13 +1425,13 @@ configurations and configuration settings.
           data), rather than reporting failure.  By default this option
           is turned off.
 
-     'OptionSemicolonSeparators'
+     'Config::OptionSemicolonSeparators'
           This option controls whether a semicolon (';') is output after
           each setting when the configuration is written to a file or
           stream.  (The semicolon separators are optional in the
           configuration syntax.)  By default this option is turned on.
 
-     'OptionColonAssignmentForGroups'
+     'Config::OptionColonAssignmentForGroups'
           This option controls whether a colon (':') is output between
           each group setting's name and its value when the configuration
           is written to a file or stream.  If the option is turned off,
@@ -1231,7 +1439,7 @@ configurations and configuration settings.
           interchangeable in the configuration syntax.)  By default this
           option is turned on.
 
-     'OptionColonAssignmentForNonGroups'
+     'Config::OptionColonAssignmentForNonGroups'
           This option controls whether a colon (':') is output between
           each non-group setting's name and its value when the
           configuration is written to a file or stream.  If the option
@@ -1239,33 +1447,63 @@ configurations and configuration settings.
           tokens are interchangeable in the configuration syntax.)  By
           default this option is turned off.
 
-     'OptionOpenBraceOnSeparateLine'
+     'Config::OptionOpenBraceOnSeparateLine'
           This option controls whether an open brace ('{') will be
           written on its own line when the configuration is written to a
           file or stream.  If the option is turned off, the brace will
           be written at the end of the previous line.  By default this
           option is turned on.
 
+     'Config::OptionAllowScientificNotation'
+          (Since v1.7) This option controls whether scientific notation
+          may be used as appropriate when writing floating point values
+          (corresponding to 'printf()' '%g' format) or should never be
+          used (corresponding to 'printf()' '%f' format).  By default
+          this option is turned off.
+
+     'Config::OptionFsync'
+          (Since v1.7.1) This option controls whether the 'writeFile()'
+          method performs an fsync operation after writing the
+          configuration and before closing the file.  By default this
+          option is turned off.
+
+     'Config::OptionAllowOverrides'
+          (Since v1.7.3) This option controls whether duplicate settings
+          override previous settings with the same name.  If this option
+          is turned off, duplicate settings are rejected.  By default
+          this option is turned off.
+
+ -- Method on Config: bool getOption (Config::Option OPTION) const
+ -- Method on Config: void setOption (Config::Option OPTION, bool FLAG)
+
+     Since v1.7
+
+     These methods get and set the option OPTION for the configuration.
+     The option is enabled if FLAG is 'true' and disabled if it is
+     'false'.
+
+     See 'setOptions()' above for the list of available options.
+
+ -- Method on Config: bool getAutoConvert () const
  -- Method on Config: void setAutoConvert (bool FLAG)
- -- Method on Config: bool getAutoConvert ()
 
      These methods get and set the 'OptionAutoConvert' option.  They are
-     obsoleted by the 'setOptions()' and 'getOptions()' methods
-     described above.
+     obsoleted by the 'setOption()' and 'getOption()' methods described
+     above.
 
+ -- Method on Config: Setting::Format getDefaultFormat () const
  -- Method on Config: void setDefaultFormat (Setting::Format FORMAT)
- -- Method on Config: Setting::Format getDefaultFormat ()
 
-     These methods set and get the default external format for settings
+     These methods get and set the default external format for settings
      in the configuration.  If a non-default format has not been set for
      a setting with 'Setting::setFormat()', this configuration-wide
      default format will be used instead when that setting is written to
      a file or stream.
 
+ -- Method on Config: unsigned short getTabWidth () const
  -- Method on Config: void setTabWidth (unsigned short WIDTH)
- -- Method on Config: unsigned short getTabWidth ()
 
-     These methods set and get the tab width for the configuration.  The
+     These methods get and set the tab width for the configuration.  The
      tab width affects the formatting of the configuration when it is
      written to a file or stream: each level of nesting is indented by
      WIDTH spaces, or by a single tab character if WIDTH is 0.  The tab
@@ -1273,60 +1511,76 @@ configurations and configuration settings.
 
      Valid tab widths range from 0 to 15.  The default tab width is 2.
 
- -- Method on Config: Setting & getRoot ()
+ -- Method on Config: unsigned short getFloatPrecision () const
+ -- Method on Config: void setFloatPrecision (unsigned short WIDTH)
+
+     These methods get and set the float precision for the
+     configuration.  This parameter influences the formatting of
+     floating point settings in the configuration when it is written to
+     a file or stream.  Float precision has no effect on parsing.
+
+     Valid precisions range from 0 to about 15 (implementation
+     dependent), though the library will accept and store values up to
+     255.
+
+ -- Method on Config: Setting & getRoot () const
 
      This method returns the root setting for the configuration, which
      is a group.
 
- -- Method on Config: Setting & lookup (const std::string &PATH)
- -- Method on Config: Setting & lookup (const char * PATH)
+ -- Method on Config: Setting & lookup (const std::string &PATH) const
+ -- Method on Config: Setting & lookup (const char * PATH) const
 
      These methods locate the setting specified by the path PATH.  If
      the requested setting is not found, a 'SettingNotFoundException' is
      thrown.
 
- -- Method on Config: bool exists (const std::string &PATH)
- -- Method on Config: bool exists (const char *PATH)
+ -- Method on Config: bool exists (const std::string &PATH) const
+ -- Method on Config: bool exists (const char *PATH) const
 
      These methods test if a setting with the given PATH exists in the
      configuration.  They return 'true' if the setting exists, and
      'false' otherwise.  These methods do not throw exceptions.
 
  -- Method on Config: bool lookupValue (const char *PATH, bool &VALUE)
+          const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          bool &VALUE)
+          bool &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH, int &VALUE)
+          const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          int &VALUE)
+          int &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH,
-          unsigned int &VALUE)
+          unsigned int &VALUE) const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          unsigned int &VALUE)
+          unsigned int &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH,
-          long long &VALUE)
+          long long &VALUE) const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          long long &VALUE)
+          long long &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH, float &VALUE)
+          const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          float &VALUE)
+          float &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH, double &VALUE)
+          const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          double &VALUE)
+          double &VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH,
-          const char *&VALUE)
+          const char *&VALUE) const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          const char *&VALUE)
+          const char *&VALUE) const
 
  -- Method on Config: bool lookupValue (const char *PATH,
-          std::string &VALUE)
+          std::string &VALUE) const
  -- Method on Config: bool lookupValue (const std::string &PATH,
-          std::string &VALUE)
+          std::string &VALUE) const
 
      These are convenience methods for looking up the value of a setting
      with the given PATH.  If the setting is found and is of an
@@ -1366,24 +1620,24 @@ configurations and configuration settings.
      rules of C++, e.g., if the first lookup fails (returning 'false'),
      the remaining lookups are skipped entirely.
 
- -- Method on Setting: operator bool ()
- -- Method on Setting: operator int ()
- -- Method on Setting: operator unsigned int ()
- -- Method on Setting: operator long ()
- -- Method on Setting: operator unsigned long ()
- -- Method on Setting: operator long long ()
- -- Method on Setting: operator unsigned long long ()
- -- Method on Setting: operator float ()
- -- Method on Setting: operator double ()
- -- Method on Setting: operator const char * ()
- -- Method on Setting: operator std::string ()
- -- Method on Setting: const char * c_str ()
+ -- Method on Setting: operator bool () const
+ -- Method on Setting: operator int () const
+ -- Method on Setting: operator unsigned int () const
+ -- Method on Setting: operator long () const
+ -- Method on Setting: operator unsigned long () const
+ -- Method on Setting: operator long long () const
+ -- Method on Setting: operator unsigned long long () const
+ -- Method on Setting: operator float () const
+ -- Method on Setting: operator double () const
+ -- Method on Setting: operator const char * () const
+ -- Method on Setting: operator std::string () const
+ -- Method on Setting: const char * c_str () const
 
      These cast operators allow a 'Setting' object to be assigned to a
      variable of type bool if it is of type 'TypeBoolean'; int, unsigned
      int; 'long long' or 'unsigned long long' if it is of type
-     'TypeInt64', float or double if it is of type 'TypeFloat'; or const char *
-     or std::string if it is of type 'TypeString'.
+     'TypeInt64', float or double if it is of type 'TypeFloat'; or
+     const char * or std::string if it is of type 'TypeString'.
 
      Values of type 'TypeInt' or 'TypeInt64' may be assigned to
      variables of type long, or unsigned long, depending on the sizes of
@@ -1475,9 +1729,10 @@ configurations and configuration settings.
      If the assignment is invalid due to a type mismatch, a
      'SettingTypeException' is thrown.
 
- -- Method on Setting: Setting & operator[] (int INDEX)
+ -- Method on Setting: Setting & operator[] (int INDEX) const
  -- Method on Setting: Setting & operator[] (const std::string &NAME)
- -- Method on Setting: Setting & operator[] (const char *NAME)
+          const
+ -- Method on Setting: Setting & operator[] (const char *NAME) const
 
      A 'Setting' object may be subscripted with an integer index INDEX
      if it is an array or list, or with either a string NAME or an
@@ -1497,54 +1752,57 @@ configurations and configuration settings.
      return the settings in the same order that they appear in the
      configuration.
 
- -- Method on Setting: Setting & lookup (const char * PATH)
- -- Method on Setting: Setting & lookup (const std::string &PATH)
+ -- Method on Setting: Setting & lookup (const char * PATH) const
+ -- Method on Setting: Setting & lookup (const std::string &PATH) const
 
-     This function locates a setting by a path PATH relative to this
+     These methods locate a setting by a path PATH relative to this
      setting.  If requested setting is not found, a
      'SettingNotFoundException' is thrown.
 
  -- Method on Setting: bool lookupValue (const char *NAME, bool &VALUE)
+          const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          bool &VALUE)
+          bool &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME, int &VALUE)
+          const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          int &VALUE)
+          int &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          unsigned int &VALUE)
+          unsigned int &VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          unsigned int &VALUE)
+          unsigned int &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          long long &VALUE)
+          long long &VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          long long &VALUE)
+          long long &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          unsigned long long &VALUE)
+          unsigned long long &VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          unsigned long long &VALUE)
+          unsigned long long &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME, float &VALUE)
+          const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          float &VALUE)
+          float &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          double &VALUE)
+          double &VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          double &VALUE)
+          double &VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          const char *&VALUE)
+          const char *&VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          const char *&VALUE)
+          const char *&VALUE) const
 
  -- Method on Setting: bool lookupValue (const char *NAME,
-          std::string &VALUE)
+          std::string &VALUE) const
  -- Method on Setting: bool lookupValue (const std::string &NAME,
-          std::string &VALUE)
+          std::string &VALUE) const
 
      These are convenience methods for looking up the value of a child
      setting with the given NAME.  If the setting is found and is of an
@@ -1636,7 +1894,7 @@ configurations and configuration settings.
      'SettingTypeException' is thrown.  If INDEX is out of range, a
      'SettingNotFoundException' is thrown.
 
- -- Method on Setting: const char * getName ()
+ -- Method on Setting: const char * getName () const
 
      This method returns the name of the setting, or 'NULL' if the
      setting has no name.  Storage for the returned string is managed by
@@ -1645,36 +1903,36 @@ configurations and configuration settings.
      and convenience, consider assigning the return value to a
      'std::string'.
 
- -- Method on Setting: std::string getPath ()
+ -- Method on Setting: std::string getPath () const
 
      This method returns the complete dot-separated path to the setting.
      Settings which do not have a name (list and array elements) are
      represented by their index in square brackets.
 
- -- Method on Setting: Setting & getParent ()
+ -- Method on Setting: Setting & getParent () const
 
      This method returns the parent setting of the setting.  If the
      setting is the root setting, a 'SettingNotFoundException' is
      thrown.
 
- -- Method on Setting: bool isRoot ()
+ -- Method on Setting: bool isRoot () const
 
      This method returns 'true' if the setting is the root setting, and
      'false' otherwise.
 
- -- Method on Setting: int getIndex ()
+ -- Method on Setting: int getIndex () const
 
      This method returns the index of the setting within its parent
      setting.  When applied to the root setting, this method returns -1.
 
- -- Method on Setting: Setting::Type getType ()
+ -- Method on Setting: Setting::Type getType () const
 
      This method returns the type of the setting.  The 'Setting::Type'
      enumeration consists of the following constants: 'TypeInt',
      'TypeInt64', 'TypeFloat', 'TypeString', 'TypeBoolean', 'TypeArray',
      'TypeList', and 'TypeGroup'.
 
- -- Method on Setting: Setting::Format getFormat ()
+ -- Method on Setting: Setting::Format getFormat () const
  -- Method on Setting: void setFormat (Setting::Format FORMAT)
 
      These methods get and set the external format for the setting.
@@ -1686,8 +1944,8 @@ configurations and configuration settings.
      to settings of type 'TypeInt' and 'TypeInt64'.  If FORMAT is
      invalid for the given setting, it is ignored.
 
- -- Method on Setting: bool exists (const std::string &NAME)
- -- Method on Setting: bool exists (const char *NAME)
+ -- Method on Setting: bool exists (const std::string &NAME) const
+ -- Method on Setting: bool exists (const char *NAME) const
 
      These methods test if the setting has a child setting with the
      given NAME.  They return 'true' if the setting exists, and 'false'
@@ -1702,50 +1960,51 @@ configurations and configuration settings.
      enumerate the child settings of a given setting.  If the setting is
      not an array, list, or group, they throw a 'SettingTypeException'.
 
- -- Method on Setting: int getLength ()
+ -- Method on Setting: int getLength () const
 
      This method returns the number of settings in a group, or the
      number of elements in a list or array.  For other types of
      settings, it returns 0.
 
- -- Method on Setting: bool isGroup ()
- -- Method on Setting: bool isArray ()
- -- Method on Setting: bool isList ()
+ -- Method on Setting: bool isGroup () const
+ -- Method on Setting: bool isArray () const
+ -- Method on Setting: bool isList () const
 
      These convenience methods test if a setting is of a given type.
 
- -- Method on Setting: bool isAggregate ()
- -- Method on Setting: bool isScalar ()
- -- Method on Setting: bool isNumber ()
+ -- Method on Setting: bool isAggregate () const
+ -- Method on Setting: bool isScalar () const
+ -- Method on Setting: bool isNumber () const
+ -- Method on Setting: bool isString () const
 
      These convenience methods test if a setting is of an aggregate type
      (a group, array, or list), of a scalar type (integer, 64-bit
-     integer, floating point, boolean, or string), and of a number
-     (integer, 64-bit integer, or floating point), respectively.
+     integer, floating point, boolean, or string), of a number (integer,
+     64-bit integer, or floating point), and of a string respectively.
 
- -- Method on Setting: const char * getSourceFile ()
+ -- Method on Setting: const char * getSourceFile () const
 
-     This function returns the name of the file from which the setting
-     was read, or NULL if the setting was not read from a file.  This
+     This method returns the name of the file from which the setting was
+     read, or NULL if the setting was not read from a file.  This
      information is useful for reporting application-level errors.
      Storage for the returned string is managed by the library and
      released automatically when the configuration is destroyed; the
      string must not be freed by the caller.
 
- -- Method on Setting: unsigned int getSourceLine ()
+ -- Method on Setting: unsigned int getSourceLine () const
 
-     This function returns the line number of the configuration file or
+     This method returns the line number of the configuration file or
      stream at which the setting SETTING was read, or 0 if no line
      number is available.  This information is useful for reporting
      application-level errors.
 
 
-File: libconfig.info,  Node: Example Programs,  Next: Configuration File Grammar,  Prev: The C++ API,  Up: Top
+File: libconfig.info,  Node: Example Programs,  Next: Other Bindings and Implementations,  Prev: The C++ API,  Up: Top
 
 5 Example Programs
 ******************
 
-Practical example programs that illustrate how to use libconfig from
+   Practical example programs that illustrate how to use libconfig from
 both C and C++ are included in the 'examples' subdirectory of the
 distribution.  These examples include:
 
@@ -1773,54 +2032,138 @@ distribution.  These examples include:
 'examples/c++/example3.cpp'
      The C++ equivalent of 'example3.c'
 
-
-File: libconfig.info,  Node: Configuration File Grammar,  Next: License,  Prev: Example Programs,  Up: Top
-
-6 Configuration File Grammar
-****************************
-
-Below is the BNF grammar for configuration files.  Comments and include
-directives are not part of the grammar, so they are not included here.
-
-
-     configuration = setting-list | empty
-
-     setting-list = setting | setting-list setting
-
-     setting = name (":" | "=") value (";" | "," | empty)
-
-     value = scalar-value | array | list | group
-
-     value-list = value | value-list "," value
-
-     scalar-value = boolean | integer | integer64 | hex | hex64 | float
-                    | string
-
-     scalar-value-list = scalar-value | scalar-value-list "," scalar-value
-
-     array = "[" (scalar-value-list | empty) "]"
-
-     list = "(" (value-list | empty) ")"
-
-     group = "{" (setting-list | empty) "}"
-
-     empty =
-
-
-
-   Terminals are defined below as regular expressions:
-
-'boolean'      '([Tt][Rr][Uu][Ee])|([Ff][Aa][Ll][Ss][Ee])'
-'string'       '\"([^\"\\]|\\.)*\"'
-'name'         '[A-Za-z\*][-A-Za-z0-9_\*]*'
-'integer'      '[-+]?[0-9]+'
-'integer64'    '[-+]?[0-9]+L(L)?'
-'hex'          '0[Xx][0-9A-Fa-f]+'
-'hex64'        '0[Xx][0-9A-Fa-f]+L(L)?'
-'float'        '([-+]?([0-9]*)?\.[0-9]*([eE][-+]?[0-9]+)?)|([-+]([0-9]+)(\.[0-9]*)?[eE][-+]?[0-9]+)'
+'examples/c/example4.c'
+     An example C program that uses a custom include function for
+     processing wildcard includes.  Note that this code will not compile
+     on Windows.
 
 
-File: libconfig.info,  Node: License,  Next: Function Index,  Prev: Configuration File Grammar,  Up: Top
+File: libconfig.info,  Node: Other Bindings and Implementations,  Next: License,  Prev: Example Programs,  Up: Top
+
+6 Other Bindings and Implementations
+************************************
+
+* Menu:
+
+* Bourne Shell::
+* D::
+* Haskell::
+* Java::
+* Lisp::
+* Perl::
+* Python::
+* Ruby::
+
+   Various open-source libraries have been written that provide access
+to libconfig-style configuration files from other programming languages.
+Some of these libraries are wrappers which add new language bindings for
+libconfig while others are syntax-compatible reimplementations in other
+languages.
+
+   Here is a list of some of these implementations.
+
+
+File: libconfig.info,  Node: Bourne Shell,  Next: D,  Up: Other Bindings and Implementations
+
+6.1 Bourne Shell
+================
+
+   /Lukasz A. Grabowski's ls-config provides a means to read and write
+values in libconfig configuration files from Bourne shell scripts.  The
+implementation is included in the libconfig git repository at
+<https://github.com/hyperrealm/libconfig>, in the 'contrib/ls-config'
+subdirectory.
+
+
+File: libconfig.info,  Node: D,  Next: Haskell,  Prev: Bourne Shell,  Up: Other Bindings and Implementations
+
+6.2 D
+=====
+
+   Remi Thebault's libconfig-d is a port of libconfig to the D
+programming language.  It may be found at
+<https://code.dlang.org/packages/libconfig-d>.
+
+
+File: libconfig.info,  Node: Haskell,  Next: Java,  Prev: D,  Up: Other Bindings and Implementations
+
+6.3 Haskell
+===========
+
+   Matthew Peddie's libconfig provides Haskell bindings to libconfig.
+It may be found at
+<https://hackage.haskell.org/package/libconfig-0.3.0.0>.
+
+
+File: libconfig.info,  Node: Java,  Next: Lisp,  Prev: Haskell,  Up: Other Bindings and Implementations
+
+6.4 Java
+========
+
+   Andrey V. Pleskach has a pure-Java implementation of libconfig.  It
+may be found on github at <https://github.com/willyborankin/libconfig>.
+
+
+File: libconfig.info,  Node: Lisp,  Next: Perl,  Prev: Java,  Up: Other Bindings and Implementations
+
+6.5 Lisp
+========
+
+   Oleg Shalaev's cl-libconfig provides Common Lisp bindings for
+libconfig.  It may be found on github at
+<https://github.com/chalaev/cl-libconfig>.
+
+
+File: libconfig.info,  Node: Perl,  Next: Python,  Prev: Lisp,  Up: Other Bindings and Implementations
+
+6.6 Perl
+========
+
+   The Conf::Libconfig module provides Perl bindings for libconfig.  It
+may be found on CPAN at
+<http://search.cpan.org/~cnangel/Conf-Libconfig-0.05/> or on github at
+<https://github.com/cnangel/Conf-Libconfig>.
+
+
+File: libconfig.info,  Node: Python,  Next: Ruby,  Prev: Perl,  Up: Other Bindings and Implementations
+
+6.7 Python
+==========
+
+   Heiner Tholen's pylibconfig2 is a Python library that is
+syntax-compatible with libconfig.  It may be found at
+<https://pypi.python.org/pypi/pylibconfig2/0.1.2>.
+
+
+   Christian Aichinger's libconf is another pure-Python implementation
+with a more permissive license.  It may be found at
+<https://pypi.python.org/pypi/libconf> or on github at
+<https://github.com/Grk0/python-libconf>.
+
+
+   The python-libconfig wrapper provides Python bindings to libconfig.
+It may be found on github at
+<https://github.com/cnangel/python-libconfig/>.
+
+
+File: libconfig.info,  Node: Ruby,  Prev: Python,  Up: Other Bindings and Implementations
+
+6.8 Ruby
+========
+
+   Christopher Mark Gore's ruby-libconfig is a Ruby library that
+provides Ruby bindings for libconfig.  It may be found at
+<https://rubygems.org/gems/libconfig> or on github at
+<https://github.com/cgore/ruby-libconfig>.
+
+
+   There is also another Ruby wrapper, libconfig-ruby, that is included
+in the libconfig git repository at
+<https://github.com/hyperrealm/libconfig>, in the
+'contrib/libconfig-ruby' subdirectory.
+
+
+File: libconfig.info,  Node: License,  Next: Configuration File Grammar,  Prev: Other Bindings and Implementations,  Up: Top
 
 Appendix A License
 ******************
@@ -2376,7 +2719,83 @@ Ty Coon, President of Vice
    That's all there is to it!
 
 
-File: libconfig.info,  Node: Function Index,  Next: Type Index,  Prev: License,  Up: Top
+File: libconfig.info,  Node: Configuration File Grammar,  Next: Function Index,  Prev: License,  Up: Top
+
+Appendix B Configuration File Grammar
+*************************************
+
+   Below is the BNF grammar for configuration files.  Comments and
+include directives are not part of the grammar, so they are not included
+here.
+
+
+     <configuration> ::=
+           <setting-list>
+         | <empty>
+
+     <setting-list> ::=
+           <setting>
+         | <setting-list> <setting>
+
+     <setting> ::=
+           <name> ( ":" | "=" ) <value> ( ";" | "," | <empty> )
+
+     <value> ::=
+           <scalar-value>
+         | <array>
+         | <list>
+         | <group>
+
+     <value-list> ::=
+           <value>
+         | <value-list> "," <value>
+         | <value-list> ","
+
+     <scalar-value> ::=
+           <boolean>
+         | <integer>
+         | <integer64>
+         | <hex>
+         | <hex64>
+         | <float>
+         | <string>
+
+     <scalar-value-list> ::=
+           <scalar-value>
+         | <scalar-value-list> "," <scalar-value>
+         | <scalar-value-list> ","
+
+     <array> ::=
+           "[" ( <scalar-value-list> | <empty> ) "]"
+
+     <list> ::=
+           "(" ( <value-list> | <empty> ) ")"
+
+     <group> ::=
+           "{" ( <setting-list> | <empty> ) "}"
+
+     <empty> ::=
+
+
+
+   Terminals are defined below as regular expressions:
+
+'<boolean>'    '([Tt][Rr][Uu][Ee])|([Ff][Aa][Ll][Ss][Ee])'
+'<string>'     '\"([^\"\\]|\\.)*\"'
+'<name>'       '[A-Za-z\*][-A-Za-z0-9_\*]*'
+'<integer>'    '[-+]?[0-9]+'
+'<integer64>'  '[-+]?[0-9]+L(L)?'
+'<hex>'        '0[Xx][0-9A-Fa-f]+'
+'<hex64>'      '0[Xx][0-9A-Fa-f]+(L(L)?)?'
+'<float>'      '([-+]?([0-9]*)?\.[0-9]*([eE][-+]?[0-9]+)?)|([-+]([0-9]+)(\.[0-9]*)?[eE][-+]?[0-9]+)'
+
+
+   Note that adjacent strings are automatically concatenated.
+Non-printable characters can be represented within strings using a
+sequence '\xx', representing the ASCII value as two hex digits.
+
+
+File: libconfig.info,  Node: Function Index,  Next: Type Index,  Prev: Configuration File Grammar,  Up: Top
 
 Function Index
 **************
@@ -2385,203 +2804,220 @@ Function Index
 * Menu:
 
 * ~Config on Config:                     The C++ API.         (line  75)
-* add on Setting:                        The C++ API.         (line 516)
-* add on Setting <1>:                    The C++ API.         (line 518)
-* add on Setting <2>:                    The C++ API.         (line 531)
-* begin on Setting:                      The C++ API.         (line 625)
-* begin on Setting <1>:                  The C++ API.         (line 627)
+* add on Setting:                        The C++ API.         (line 621)
+* add on Setting <1>:                    The C++ API.         (line 623)
+* add on Setting <2>:                    The C++ API.         (line 637)
+* begin on Setting:                      The C++ API.         (line 731)
+* begin on Setting <1>:                  The C++ API.         (line 733)
+* clear on Config:                       The C++ API.         (line  79)
 * Config on Config:                      The C++ API.         (line  74)
+* config_clear:                          The C API.           (line  26)
 * config_destroy:                        The C API.           (line  14)
-* config_error_file:                     The C API.           (line  65)
-* config_error_line:                     The C API.           (line  66)
-* config_error_text:                     The C API.           (line  64)
-* config_error_type:                     The C API.           (line  78)
-* config_get_auto_convert:               The C API.           (line 152)
-* config_get_default_format:             The C API.           (line 160)
-* config_get_include_dir:                The C API.           (line  88)
-* config_get_options:                    The C API.           (line 106)
-* config_get_tab_width:                  The C API.           (line 171)
+* config_error_file:                     The C API.           (line  76)
+* config_error_line:                     The C API.           (line  77)
+* config_error_text:                     The C API.           (line  75)
+* config_error_type:                     The C API.           (line  89)
+* config_get_auto_convert:               The C API.           (line 270)
+* config_get_default_format:             The C API.           (line 277)
+* config_get_float_precision(config_t *CONFIG): The C API.    (line 176)
+* config_get_hook:                       The C API.           (line 643)
+* config_get_include_dir:                The C API.           (line  99)
+* config_get_option:                     The C API.           (line 257)
+* config_get_options:                    The C API.           (line 192)
+* config_get_tab_width:                  The C API.           (line 289)
 * config_init:                           The C API.           (line  13)
-* config_lookup:                         The C API.           (line 206)
-* config_lookup_bool:                    The C API.           (line 189)
-* config_lookup_float:                   The C API.           (line 187)
-* config_lookup_int:                     The C API.           (line 183)
-* config_lookup_int64:                   The C API.           (line 185)
-* config_lookup_string:                  The C API.           (line 191)
-* config_read:                           The C API.           (line  26)
-* config_read_file:                      The C API.           (line  35)
-* config_read_string:                    The C API.           (line  44)
-* config_root_setting:                   The C API.           (line 405)
-* config_setting_add:                    The C API.           (line 368)
-* config_setting_get_bool:               The C API.           (line 228)
-* config_setting_get_bool_elem:          The C API.           (line 332)
-* config_setting_get_elem:               The C API.           (line 318)
-* config_setting_get_float:              The C API.           (line 226)
-* config_setting_get_float_elem:         The C API.           (line 330)
-* config_setting_get_format:             The C API.           (line 287)
-* config_setting_get_hook:               The C API.           (line 498)
-* config_setting_get_int:                The C API.           (line 222)
-* config_setting_get_int64:              The C API.           (line 224)
-* config_setting_get_int64_elem:         The C API.           (line 328)
-* config_setting_get_int_elem:           The C API.           (line 326)
-* config_setting_get_member:             The C API.           (line 311)
-* config_setting_get_string:             The C API.           (line 230)
-* config_setting_get_string_elem:        The C API.           (line 334)
-* config_setting_index:                  The C API.           (line 431)
-* config_setting_is_aggregate:           The C API.           (line 464)
-* config_setting_is_array:               The C API.           (line 455)
-* config_setting_is_group:               The C API.           (line 453)
-* config_setting_is_list:                The C API.           (line 457)
-* config_setting_is_number:              The C API.           (line 468)
-* config_setting_is_root:                The C API.           (line 425)
-* config_setting_is_scalar:              The C API.           (line 466)
-* config_setting_length:                 The C API.           (line 438)
-* config_setting_lookup:                 The C API.           (line 215)
-* config_setting_lookup_bool:            The C API.           (line 269)
-* config_setting_lookup_float:           The C API.           (line 266)
-* config_setting_lookup_int:             The C API.           (line 260)
-* config_setting_lookup_int64:           The C API.           (line 263)
-* config_setting_lookup_string:          The C API.           (line 272)
-* config_setting_name:                   The C API.           (line 411)
-* config_setting_parent:                 The C API.           (line 419)
-* config_setting_remove:                 The C API.           (line 381)
-* config_setting_remove_elem:            The C API.           (line 392)
-* config_setting_set_bool:               The C API.           (line 247)
-* config_setting_set_bool_elem:          The C API.           (line 352)
-* config_setting_set_float:              The C API.           (line 245)
-* config_setting_set_float_elem:         The C API.           (line 350)
-* config_setting_set_format:             The C API.           (line 289)
-* config_setting_set_hook:               The C API.           (line 496)
-* config_setting_set_int:                The C API.           (line 241)
-* config_setting_set_int64:              The C API.           (line 243)
-* config_setting_set_int64_elem:         The C API.           (line 348)
-* config_setting_set_int_elem:           The C API.           (line 346)
-* config_setting_set_string:             The C API.           (line 249)
-* config_setting_set_string_elem:        The C API.           (line 354)
-* config_setting_source_file:            The C API.           (line 478)
-* config_setting_source_line:            The C API.           (line 488)
-* config_setting_type:                   The C API.           (line 445)
-* config_set_auto_convert:               The C API.           (line 151)
-* config_set_default_format:             The C API.           (line 158)
-* config_set_destructor:                 The C API.           (line 508)
-* config_set_include_dir:                The C API.           (line  86)
-* config_set_options:                    The C API.           (line 105)
-* config_set_tab_width:                  The C API.           (line 169)
-* config_write:                          The C API.           (line  53)
-* config_write_file:                     The C API.           (line  57)
-* c_str on Setting:                      The C++ API.         (line 309)
-* end on Setting:                        The C++ API.         (line 626)
-* end on Setting <1>:                    The C++ API.         (line 628)
-* exists on Config:                      The C++ API.         (line 217)
-* exists on Config <1>:                  The C++ API.         (line 218)
-* exists on Setting:                     The C++ API.         (line 618)
-* exists on Setting <1>:                 The C++ API.         (line 619)
-* getAutoConvert on Config:              The C++ API.         (line 179)
-* getDefaultFormat on Config:            The C++ API.         (line 186)
-* getError on ParseException:            The C++ API.         (line 104)
-* getFile on ParseException:             The C++ API.         (line 105)
-* getFormat on Setting:                  The C++ API.         (line 606)
-* getIncludeDir on Config:               The C++ API.         (line 116)
-* getIndex on Setting:                   The C++ API.         (line 594)
-* getLength on Setting:                  The C++ API.         (line 634)
-* getLine on ParseException:             The C++ API.         (line 106)
-* getName on Setting:                    The C++ API.         (line 568)
-* getOptions on Config:                  The C++ API.         (line 133)
-* getParent on Setting:                  The C++ API.         (line 583)
-* getPath on Setting:                    The C++ API.         (line 577)
+* config_lookup:                         The C API.           (line 327)
+* config_lookup_bool:                    The C API.           (line 310)
+* config_lookup_float:                   The C API.           (line 308)
+* config_lookup_int:                     The C API.           (line 304)
+* config_lookup_int64:                   The C API.           (line 306)
+* config_lookup_string:                  The C API.           (line 312)
+* config_read:                           The C API.           (line  34)
+* config_read_file:                      The C API.           (line  43)
+* config_read_string:                    The C API.           (line  53)
+* config_root_setting:                   The C API.           (line 542)
+* config_setting_add:                    The C API.           (line 500)
+* config_setting_get_bool:               The C API.           (line 351)
+* config_setting_get_bool_elem:          The C API.           (line 464)
+* config_setting_get_elem:               The C API.           (line 449)
+* config_setting_get_float:              The C API.           (line 348)
+* config_setting_get_float_elem:         The C API.           (line 462)
+* config_setting_get_format:             The C API.           (line 417)
+* config_setting_get_hook:               The C API.           (line 653)
+* config_setting_get_int:                The C API.           (line 343)
+* config_setting_get_int64:              The C API.           (line 346)
+* config_setting_get_int64_elem:         The C API.           (line 460)
+* config_setting_get_int_elem:           The C API.           (line 457)
+* config_setting_get_member:             The C API.           (line 442)
+* config_setting_get_string:             The C API.           (line 354)
+* config_setting_get_string_elem:        The C API.           (line 466)
+* config_setting_index:                  The C API.           (line 570)
+* config_setting_is_aggregate:           The C API.           (line 607)
+* config_setting_is_array:               The C API.           (line 596)
+* config_setting_is_group:               The C API.           (line 593)
+* config_setting_is_list:                The C API.           (line 599)
+* config_setting_is_number:              The C API.           (line 613)
+* config_setting_is_root:                The C API.           (line 563)
+* config_setting_is_scalar:              The C API.           (line 610)
+* config_setting_length:                 The C API.           (line 577)
+* config_setting_lookup:                 The C API.           (line 336)
+* config_setting_lookup_bool:            The C API.           (line 397)
+* config_setting_lookup_float:           The C API.           (line 393)
+* config_setting_lookup_int:             The C API.           (line 384)
+* config_setting_lookup_int64:           The C API.           (line 389)
+* config_setting_lookup_string:          The C API.           (line 402)
+* config_setting_name:                   The C API.           (line 549)
+* config_setting_parent:                 The C API.           (line 557)
+* config_setting_remove:                 The C API.           (line 514)
+* config_setting_remove_elem:            The C API.           (line 529)
+* config_setting_set_bool:               The C API.           (line 371)
+* config_setting_set_bool_elem:          The C API.           (line 484)
+* config_setting_set_float:              The C API.           (line 369)
+* config_setting_set_float_elem:         The C API.           (line 482)
+* config_setting_set_format:             The C API.           (line 420)
+* config_setting_set_hook:               The C API.           (line 651)
+* config_setting_set_int:                The C API.           (line 365)
+* config_setting_set_int64:              The C API.           (line 367)
+* config_setting_set_int64_elem:         The C API.           (line 480)
+* config_setting_set_int_elem:           The C API.           (line 478)
+* config_setting_set_string:             The C API.           (line 373)
+* config_setting_set_string_elem:        The C API.           (line 486)
+* config_setting_source_file:            The C API.           (line 624)
+* config_setting_source_line:            The C API.           (line 634)
+* config_setting_type:                   The C API.           (line 585)
+* config_set_auto_convert:               The C API.           (line 271)
+* config_set_default_format:             The C API.           (line 278)
+* config_set_destructor:                 The C API.           (line 664)
+* config_set_float_precision(config_t *CONFIG,: The C API.    (line 178)
+* config_set_hook:                       The C API.           (line 642)
+* config_set_include_dir:                The C API.           (line  97)
+* config_set_include_func:               The C API.           (line 117)
+* config_set_option:                     The C API.           (line 258)
+* config_set_options:                    The C API.           (line 193)
+* config_set_tab_width:                  The C API.           (line 292)
+* config_write:                          The C API.           (line  63)
+* config_write_file:                     The C API.           (line  67)
+* c_str on Setting:                      The C++ API.         (line 404)
+* end on Setting:                        The C++ API.         (line 732)
+* end on Setting <1>:                    The C++ API.         (line 734)
+* evaluateIncludePath on Config:         The C++ API.         (line 143)
+* exists on Config:                      The C++ API.         (line 301)
+* exists on Config <1>:                  The C++ API.         (line 302)
+* exists on Setting:                     The C++ API.         (line 724)
+* exists on Setting <1>:                 The C++ API.         (line 725)
+* func:                                  The C API.           (line 128)
+* getAutoConvert on Config:              The C++ API.         (line 250)
+* getDefaultFormat on Config:            The C++ API.         (line 257)
+* getError on ParseException:            The C++ API.         (line 115)
+* getFile on ParseException:             The C++ API.         (line 116)
+* getFloatPrecision on Config:           The C++ API.         (line 277)
+* getFormat on Setting:                  The C++ API.         (line 712)
+* getIncludeDir on Config:               The C++ API.         (line 127)
+* getIndex on Setting:                   The C++ API.         (line 700)
+* getLength on Setting:                  The C++ API.         (line 740)
+* getLine on ParseException:             The C++ API.         (line 117)
+* getName on Setting:                    The C++ API.         (line 674)
+* getOption on Config:                   The C++ API.         (line 239)
+* getOptions on Config:                  The C++ API.         (line 173)
+* getParent on Setting:                  The C++ API.         (line 689)
+* getPath on Setting:                    The C++ API.         (line 683)
 * getPath on SettingException:           The C++ API.         (line  66)
-* getRoot on Config:                     The C++ API.         (line 205)
-* getSourceFile on Setting:              The C++ API.         (line 655)
-* getSourceLine on Setting:              The C++ API.         (line 664)
-* getTabWidth on Config:                 The C++ API.         (line 195)
-* getType on Setting:                    The C++ API.         (line 599)
-* isAggregate on Setting:                The C++ API.         (line 646)
-* isArray on Setting:                    The C++ API.         (line 641)
-* isGroup on Setting:                    The C++ API.         (line 640)
-* isList on Setting:                     The C++ API.         (line 642)
-* isNumber on Setting:                   The C++ API.         (line 648)
-* isRoot on Setting:                     The C++ API.         (line 589)
-* isScalar on Setting:                   The C++ API.         (line 647)
+* getRoot on Config:                     The C++ API.         (line 289)
+* getSourceFile on Setting:              The C++ API.         (line 762)
+* getSourceLine on Setting:              The C++ API.         (line 771)
+* getTabWidth on Config:                 The C++ API.         (line 266)
+* getType on Setting:                    The C++ API.         (line 705)
+* isAggregate on Setting:                The C++ API.         (line 752)
+* isArray on Setting:                    The C++ API.         (line 747)
+* isGroup on Setting:                    The C++ API.         (line 746)
+* isList on Setting:                     The C++ API.         (line 748)
+* isNumber on Setting:                   The C++ API.         (line 754)
+* isRoot on Setting:                     The C++ API.         (line 695)
+* isScalar on Setting:                   The C++ API.         (line 753)
+* isString on Setting:                   The C++ API.         (line 755)
 * LIBCONFIGXX_VER_MAJOR:                 Version Test Macros. (line  27)
 * LIBCONFIGXX_VER_MINOR:                 Version Test Macros. (line  28)
 * LIBCONFIGXX_VER_REVISION:              Version Test Macros. (line  29)
 * LIBCONFIG_VER_MAJOR:                   Version Test Macros. (line   8)
 * LIBCONFIG_VER_MINOR:                   Version Test Macros. (line   9)
 * LIBCONFIG_VER_REVISION:                Version Test Macros. (line  10)
-* lookup on Config:                      The C++ API.         (line 210)
-* lookup on Config <1>:                  The C++ API.         (line 211)
-* lookup on Setting:                     The C++ API.         (line 429)
-* lookup on Setting <1>:                 The C++ API.         (line 430)
-* lookupValue on Config:                 The C++ API.         (line 224)
-* lookupValue on Config <1>:             The C++ API.         (line 225)
-* lookupValue on Config <2>:             The C++ API.         (line 228)
-* lookupValue on Config <3>:             The C++ API.         (line 229)
-* lookupValue on Config <4>:             The C++ API.         (line 232)
-* lookupValue on Config <5>:             The C++ API.         (line 234)
-* lookupValue on Config <6>:             The C++ API.         (line 237)
-* lookupValue on Config <7>:             The C++ API.         (line 239)
-* lookupValue on Config <8>:             The C++ API.         (line 242)
-* lookupValue on Config <9>:             The C++ API.         (line 243)
-* lookupValue on Config <10>:            The C++ API.         (line 246)
-* lookupValue on Config <11>:            The C++ API.         (line 247)
-* lookupValue on Config <12>:            The C++ API.         (line 250)
-* lookupValue on Config <13>:            The C++ API.         (line 252)
-* lookupValue on Config <14>:            The C++ API.         (line 255)
-* lookupValue on Config <15>:            The C++ API.         (line 257)
-* lookupValue on Setting:                The C++ API.         (line 436)
-* lookupValue on Setting <1>:            The C++ API.         (line 437)
-* lookupValue on Setting <2>:            The C++ API.         (line 440)
-* lookupValue on Setting <3>:            The C++ API.         (line 441)
-* lookupValue on Setting <4>:            The C++ API.         (line 444)
-* lookupValue on Setting <5>:            The C++ API.         (line 446)
-* lookupValue on Setting <6>:            The C++ API.         (line 449)
-* lookupValue on Setting <7>:            The C++ API.         (line 451)
-* lookupValue on Setting <8>:            The C++ API.         (line 454)
-* lookupValue on Setting <9>:            The C++ API.         (line 456)
-* lookupValue on Setting <10>:           The C++ API.         (line 459)
-* lookupValue on Setting <11>:           The C++ API.         (line 460)
-* lookupValue on Setting <12>:           The C++ API.         (line 463)
-* lookupValue on Setting <13>:           The C++ API.         (line 465)
-* lookupValue on Setting <14>:           The C++ API.         (line 468)
-* lookupValue on Setting <15>:           The C++ API.         (line 470)
-* lookupValue on Setting <16>:           The C++ API.         (line 473)
-* lookupValue on Setting <17>:           The C++ API.         (line 475)
-* operator bool () on Setting:           The C++ API.         (line 298)
-* operator const char * () on Setting:   The C++ API.         (line 307)
-* operator double () on Setting:         The C++ API.         (line 306)
-* operator float () on Setting:          The C++ API.         (line 305)
-* operator int () on Setting:            The C++ API.         (line 299)
-* operator long () on Setting:           The C++ API.         (line 301)
-* operator long long () on Setting:      The C++ API.         (line 303)
-* operator std::string () on Setting:    The C++ API.         (line 308)
-* operator unsigned int () on Setting:   The C++ API.         (line 300)
-* operator unsigned long () on Setting:  The C++ API.         (line 302)
-* operator unsigned long long () on Setting: The C++ API.     (line 304)
-* operator= on Setting:                  The C++ API.         (line 383)
-* operator= on Setting <1>:              The C++ API.         (line 384)
-* operator= on Setting <2>:              The C++ API.         (line 385)
-* operator= on Setting <3>:              The C++ API.         (line 386)
-* operator= on Setting <4>:              The C++ API.         (line 387)
-* operator= on Setting <5>:              The C++ API.         (line 388)
-* operator= on Setting <6>:              The C++ API.         (line 389)
-* operator= on Setting <7>:              The C++ API.         (line 390)
-* operator[] on Setting:                 The C++ API.         (line 407)
-* operator[] on Setting <1>:             The C++ API.         (line 408)
-* operator[] on Setting <2>:             The C++ API.         (line 409)
+* lookup on Config:                      The C++ API.         (line 294)
+* lookup on Config <1>:                  The C++ API.         (line 295)
+* lookup on Setting:                     The C++ API.         (line 526)
+* lookup on Setting <1>:                 The C++ API.         (line 527)
+* lookupValue on Config:                 The C++ API.         (line 308)
+* lookupValue on Config <1>:             The C++ API.         (line 310)
+* lookupValue on Config <2>:             The C++ API.         (line 314)
+* lookupValue on Config <3>:             The C++ API.         (line 316)
+* lookupValue on Config <4>:             The C++ API.         (line 320)
+* lookupValue on Config <5>:             The C++ API.         (line 323)
+* lookupValue on Config <6>:             The C++ API.         (line 326)
+* lookupValue on Config <7>:             The C++ API.         (line 329)
+* lookupValue on Config <8>:             The C++ API.         (line 332)
+* lookupValue on Config <9>:             The C++ API.         (line 334)
+* lookupValue on Config <10>:            The C++ API.         (line 338)
+* lookupValue on Config <11>:            The C++ API.         (line 340)
+* lookupValue on Config <12>:            The C++ API.         (line 343)
+* lookupValue on Config <13>:            The C++ API.         (line 346)
+* lookupValue on Config <14>:            The C++ API.         (line 349)
+* lookupValue on Config <15>:            The C++ API.         (line 352)
+* lookupValue on Setting:                The C++ API.         (line 533)
+* lookupValue on Setting <1>:            The C++ API.         (line 535)
+* lookupValue on Setting <2>:            The C++ API.         (line 539)
+* lookupValue on Setting <3>:            The C++ API.         (line 541)
+* lookupValue on Setting <4>:            The C++ API.         (line 545)
+* lookupValue on Setting <5>:            The C++ API.         (line 547)
+* lookupValue on Setting <6>:            The C++ API.         (line 550)
+* lookupValue on Setting <7>:            The C++ API.         (line 553)
+* lookupValue on Setting <8>:            The C++ API.         (line 556)
+* lookupValue on Setting <9>:            The C++ API.         (line 558)
+* lookupValue on Setting <10>:           The C++ API.         (line 561)
+* lookupValue on Setting <11>:           The C++ API.         (line 563)
+* lookupValue on Setting <12>:           The C++ API.         (line 566)
+* lookupValue on Setting <13>:           The C++ API.         (line 568)
+* lookupValue on Setting <14>:           The C++ API.         (line 571)
+* lookupValue on Setting <15>:           The C++ API.         (line 574)
+* lookupValue on Setting <16>:           The C++ API.         (line 577)
+* lookupValue on Setting <17>:           The C++ API.         (line 580)
+* operator bool () on Setting:           The C++ API.         (line 393)
+* operator const char * () on Setting:   The C++ API.         (line 402)
+* operator double () on Setting:         The C++ API.         (line 401)
+* operator float () on Setting:          The C++ API.         (line 400)
+* operator int () on Setting:            The C++ API.         (line 394)
+* operator long () on Setting:           The C++ API.         (line 396)
+* operator long long () on Setting:      The C++ API.         (line 398)
+* operator std::string () on Setting:    The C++ API.         (line 403)
+* operator unsigned int () on Setting:   The C++ API.         (line 395)
+* operator unsigned long () on Setting:  The C++ API.         (line 397)
+* operator unsigned long long () on Setting: The C++ API.     (line 399)
+* operator= on Setting:                  The C++ API.         (line 479)
+* operator= on Setting <1>:              The C++ API.         (line 480)
+* operator= on Setting <2>:              The C++ API.         (line 481)
+* operator= on Setting <3>:              The C++ API.         (line 482)
+* operator= on Setting <4>:              The C++ API.         (line 483)
+* operator= on Setting <5>:              The C++ API.         (line 484)
+* operator= on Setting <6>:              The C++ API.         (line 485)
+* operator= on Setting <7>:              The C++ API.         (line 486)
+* operator[] on Setting:                 The C++ API.         (line 503)
+* operator[] on Setting <1>:             The C++ API.         (line 504)
+* operator[] on Setting <2>:             The C++ API.         (line 506)
 * ParseException on ParseException:      The C++ API.         (line  53)
-* read on Config:                        The C++ API.         (line  79)
-* readFile on Config:                    The C++ API.         (line  87)
-* readString on Config:                  The C++ API.         (line  98)
-* readString on Config <1>:              The C++ API.         (line  99)
-* remove on Setting:                     The C++ API.         (line 547)
-* remove on Setting <1>:                 The C++ API.         (line 548)
-* remove on Setting <2>:                 The C++ API.         (line 558)
-* setAutoConvert on Config:              The C++ API.         (line 178)
-* setDefaultFormat on Config:            The C++ API.         (line 185)
-* setFormat on Setting:                  The C++ API.         (line 607)
-* setIncludeDir on Config:               The C++ API.         (line 115)
-* setOptions on Config:                  The C++ API.         (line 132)
-* setTabWidth on Config:                 The C++ API.         (line 194)
+* read on Config:                        The C++ API.         (line  87)
+* readFile on Config:                    The C++ API.         (line  95)
+* readFile on Config <1>:                The C++ API.         (line  96)
+* readString on Config:                  The C++ API.         (line 109)
+* readString on Config <1>:              The C++ API.         (line 110)
+* remove on Setting:                     The C++ API.         (line 653)
+* remove on Setting <1>:                 The C++ API.         (line 654)
+* remove on Setting <2>:                 The C++ API.         (line 664)
+* setAutoConvert on Config:              The C++ API.         (line 251)
+* setDefaultFormat on Config:            The C++ API.         (line 258)
+* setFloatPrecision on Config:           The C++ API.         (line 278)
+* setFormat on Setting:                  The C++ API.         (line 713)
+* setIncludeDir on Config:               The C++ API.         (line 126)
+* setOption on Config:                   The C++ API.         (line 240)
+* setOptions on Config:                  The C++ API.         (line 174)
+* setTabWidth on Config:                 The C++ API.         (line 267)
 * SettingNameException on SettingNameException: The C++ API.  (line  44)
 * SettingNotFoundException on SettingNotFoundException: The C++ API.
                                                               (line  31)
@@ -2594,8 +3030,9 @@ Function Index
                                                               (line  21)
 * SettingTypeException on SettingTypeException <2>: The C++ API.
                                                               (line  23)
-* write on Config:                       The C++ API.         (line  80)
-* writeFile on Config:                   The C++ API.         (line  88)
+* write on Config:                       The C++ API.         (line  88)
+* writeFile on Config:                   The C++ API.         (line 102)
+* writeFile on Config <1>:               The C++ API.         (line 103)
 
 
 File: libconfig.info,  Node: Type Index,  Next: Concept Index,  Prev: Function Index,  Up: Top
@@ -2607,17 +3044,19 @@ Type Index
 * Menu:
 
 * Config:                                The C++ API.         (line   6)
+* Config::Option:                        The C++ API.         (line 176)
 * ConfigException:                       The C++ API.         (line  13)
-* config_error_t:                        The C API.           (line  79)
+* config_error_t:                        The C API.           (line  90)
+* config_include_fn_t:                   The C API.           (line 125)
 * config_setting_t:                      The C API.           (line   6)
 * config_t:                              The C API.           (line   6)
 * FileIOException:                       The C++ API.         (line  59)
 * ParseException:                        The C++ API.         (line  50)
 * Setting:                               The C++ API.         (line   6)
-* Setting::Format:                       The C++ API.         (line 611)
-* Setting::Type:                         The C++ API.         (line 601)
+* Setting::Format:                       The C++ API.         (line 717)
+* Setting::Type:                         The C++ API.         (line 707)
 * SettingException:                      The C++ API.         (line  62)
-* SettingFormat:                         The C API.           (line 296)
+* SettingFormat:                         The C API.           (line 427)
 * SettingNameException:                  The C++ API.         (line  41)
 * SettingNotFoundException:              The C++ API.         (line  29)
 * SettingTypeException:                  The C++ API.         (line  16)
@@ -2631,18 +3070,24 @@ Concept Index
  [index ]
 * Menu:
 
-* aggregate value:                       The C API.           (line 471)
+* aggregate value:                       The C API.           (line 617)
 * array:                                 Configuration Files. (line  24)
 * comment:                               Comments.            (line   6)
 * configuration:                         Configuration Files. (line  24)
+* destructor function:                   The C API.           (line 667)
 * escape sequence:                       String Values.       (line   6)
-* format:                                The C API.           (line 296)
+* format:                                The C API.           (line 427)
 * group:                                 Configuration Files. (line  24)
+* hook:                                  The C API.           (line 647)
+* hook <1>:                              The C API.           (line 657)
 * include directive:                     Include Directives.  (line   6)
+* include function:                      Include Directives.  (line  15)
 * list:                                  Configuration Files. (line  24)
 * locale:                                Internationalization Issues.
                                                               (line  14)
-* path:                                  Configuration Files. (line  73)
+* path:                                  Configuration Files. (line  74)
+* pkg-config:                            Compiling Using pkg-config.
+                                                              (line   6)
 * scalar value:                          Configuration Files. (line  24)
 * setting:                               Configuration Files. (line  24)
 * Unicode:                               Internationalization Issues.
@@ -2655,33 +3100,42 @@ Concept Index
 
 Tag Table:
 Node: Top244
-Node: Introduction531
-Node: Why Another Configuration File Library?1368
-Node: Using the Library from a C Program2446
-Node: Using the Library from a C++ Program2913
-Node: Multithreading Issues3575
-Node: Internationalization Issues5149
-Node: Compiling Using pkg-config6677
-Node: Version Test Macros8209
-Node: Configuration Files9398
-Node: Settings13256
-Node: Groups13575
-Node: Arrays13846
-Node: Lists14119
-Node: Integer Values14406
-Node: 64-bit Integer Values14870
-Node: Floating Point Values15249
-Node: Boolean Values15707
-Node: String Values15979
-Node: Comments17102
-Node: Include Directives18012
-Node: The C API19490
-Node: The C++ API43382
-Node: Example Programs71602
-Node: Configuration File Grammar72710
-Node: License74042
-Node: Function Index102104
-Node: Type Index117705
-Node: Concept Index118943
+Node: Introduction570
+Node: Why Another Configuration File Library?1410
+Node: Using the Library from a C Program2491
+Node: Using the Library from a C++ Program2961
+Node: Multithreading Issues3626
+Node: Internationalization Issues5203
+Node: Compiling Using pkg-config6734
+Node: Version Test Macros8269
+Node: Configuration Files9461
+Node: Settings13401
+Node: Groups13723
+Node: Arrays13997
+Node: Lists14357
+Node: Integer Values14729
+Node: 64-bit Integer Values15312
+Node: Floating Point Values16499
+Node: Boolean Values16960
+Node: String Values17235
+Node: Comments18361
+Node: Include Directives19274
+Node: The C API21711
+Node: The C++ API50964
+Node: Example Programs83552
+Node: Other Bindings and Implementations84852
+Node: Bourne Shell85491
+Node: D85912
+Node: Haskell86190
+Node: Java86466
+Node: Lisp86736
+Node: Perl87009
+Node: Python87347
+Node: Ruby88014
+Node: License88545
+Node: Configuration File Grammar116635
+Node: Function Index118570
+Node: Type Index135504
+Node: Concept Index136888
 
 End Tag Table

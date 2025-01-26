@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
-   Copyright (C) 2005-2010  Mark A Lindner
+   Copyright (C) 2005-2018  Mark A Lindner
 
    This file is part of libconfig.
 
@@ -58,6 +58,8 @@ static void parse_and_compare(const char *input_file, const char *output_file)
   config_destroy(&cfg);
 }
 
+/* ------------------------------------------------------------------------- */
+
 static void parse_file_and_compare_error(const char *input_file,
                                          const char *parse_error)
 {
@@ -80,6 +82,8 @@ static void parse_file_and_compare_error(const char *input_file,
   TT_ASSERT_STR_EQ(actual_error, expected_error);
 }
 
+/* ------------------------------------------------------------------------- */
+
 static void parse_string_and_compare_error(const char *input_text,
                                            const char *parse_error)
 {
@@ -101,6 +105,8 @@ static void parse_string_and_compare_error(const char *input_text,
   TT_ASSERT_STR_EQ(actual_error, expected_error);
 }
 
+/* ------------------------------------------------------------------------- */
+
 static const char *read_file_to_string(const char *file)
 {
   struct stat stbuf;
@@ -113,6 +119,7 @@ static const char *read_file_to_string(const char *file)
 
   size = stbuf.st_size;
   buf = (char *)malloc(size + 1);
+  TT_ASSERT_PTR_NOTNULL(buf);
 
   fp = fopen(file, "rt");
   TT_ASSERT_PTR_NOTNULL(fp);
@@ -207,14 +214,361 @@ TT_TEST(ParseInvalidStrings)
 
 /* ------------------------------------------------------------------------- */
 
+TT_TEST(BigInt1)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival;
+  long long llval;
+
+  buf = "someint=5;";
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT_EQ(ival, 5);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT_EQ(llval, 5);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt2)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival = 123;
+  long long llval;
+
+  buf = "someint=8589934592;"; /* 2^33 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  /* Should fail because value was parsed as an int64. */
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_FALSE(rc);
+  TT_ASSERT_INT_EQ(ival, 123);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, 8589934592LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt3)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival = 123;
+  long long llval;
+
+  buf = "someint=-8589934592;"; /* -2^33 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  /* Should fail because value was parsed as an int64. */
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_FALSE(rc);
+  TT_ASSERT_INT_EQ(ival, 123);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, -8589934592LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt4)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival = 123;
+  long long llval;
+
+  buf = "someint=2147483647;";  /* 2^31-1 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT_EQ(ival, 2147483647);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, 2147483647LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt5)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival = 123;
+  long long llval;
+
+  buf = "someint=2147483648;"; /* 2^31 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  /* Should fail because value was parsed as an int64. */
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_FALSE(rc);
+  TT_ASSERT_INT_EQ(ival, 123);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, 2147483648LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt6)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival;
+  long long llval;
+
+  buf = "someint=-2147483648;"; /* -2^31 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT_EQ(ival, -2147483648LL);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, -2147483648LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(BigInt7)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  int ival = 123;
+  long long llval;
+
+  buf = "someint=-2147483649;"; /* -2^31-1 */
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  /* Should fail because value was parsed as an int64. */
+  rc = config_lookup_int(&cfg, "someint", &ival);
+  TT_ASSERT_FALSE(rc);
+  TT_ASSERT_INT_EQ(ival, 123);
+
+  rc = config_lookup_int64(&cfg, "someint", &llval);
+  TT_ASSERT_TRUE(rc);
+  TT_ASSERT_INT64_EQ(llval, -2147483649LL);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(RemoveSetting)
+{
+  char *buf;
+  config_t cfg;
+  int rc;
+  config_setting_t* rootSetting;
+
+  buf = "a:{b:3;c:4;}";
+
+  config_init(&cfg);
+  rc = config_read_string(&cfg, buf);
+  TT_ASSERT_TRUE(rc);
+
+  rootSetting = config_root_setting(&cfg);
+  rc = config_setting_remove(rootSetting, "a.c");
+  TT_ASSERT_TRUE(rc);
+
+  /* a and a.b are found */
+  rootSetting = config_lookup(&cfg, "a");
+  TT_EXPECT_PTR_NOTNULL(rootSetting);
+  rootSetting = config_lookup(&cfg, "a.b");
+  TT_EXPECT_PTR_NOTNULL(rootSetting);
+  rootSetting = config_lookup(&cfg, "a.c");
+  TT_EXPECT_PTR_NULL(rootSetting);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(EscapedStrings)
+{
+  config_t cfg;
+  int ok;
+  const char *str;
+
+  config_init(&cfg);
+  config_set_include_dir(&cfg, "./testdata");
+
+  ok = config_read_file(&cfg, "testdata/strings.cfg");
+  if(!ok)
+  {
+    printf("error: %s:%d\n", config_error_text(&cfg),
+           config_error_line(&cfg));
+  }
+  TT_ASSERT_TRUE(ok);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.str", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.newline", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\ndef\n", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.cr", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\rdef\r", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.tab", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\tdef\t", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.feed", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\fdef\f", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.backslash", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\\def\\", str);
+
+  ok = config_lookup_string(&cfg, "escape_seqs.dquote", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("abc\"def\"", str);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
+TT_TEST(OverrideSetting)
+{
+  config_t cfg;
+  int ok;
+  int ival;
+  const char *str;
+
+  config_init(&cfg);
+  config_set_options(&cfg, CONFIG_OPTION_ALLOW_OVERRIDES);
+  config_set_include_dir(&cfg, "./testdata");
+
+  ok = config_read_file(&cfg, "testdata/override_setting.cfg");
+  if(!ok)
+  {
+    printf("error: %s:%d\n", config_error_text(&cfg),
+           config_error_line(&cfg));
+  }
+  TT_ASSERT_TRUE(ok);
+
+  ok = config_lookup_string(&cfg, "group.message", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("overridden", str);
+
+  ok = config_lookup_string(&cfg, "group.inner.name", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("overridden", str);
+
+  ok = config_lookup_string(&cfg, "group.inner.other", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("other", str);
+
+  ok = config_lookup_string(&cfg, "group.inner.none", &str);
+  TT_ASSERT_FALSE(ok);
+
+  ok = config_lookup_string(&cfg, "group.inner.other", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("other", str);
+
+  ok = config_lookup_string(&cfg, "string", &str);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_STR_EQ("overridden", str);
+
+  ok = config_lookup_int(&cfg, "int", &ival);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_INT_EQ(ival, 2);
+
+  ok = config_lookup_int(&cfg, "group.array.[0]", &ival);
+  TT_ASSERT_TRUE(ok);
+  TT_ASSERT_INT_EQ(ival, 3);
+
+  ok = config_lookup_int(&cfg, "group.array.[1]", &ival);
+  TT_ASSERT_FALSE(ok);
+
+  config_destroy(&cfg);
+}
+
+/* ------------------------------------------------------------------------- */
+
 int main(int argc, char **argv)
 {
+  int failures;
+
   TT_SUITE_START(LibConfigTests);
   TT_SUITE_TEST(LibConfigTests, ParsingAndFormatting);
   TT_SUITE_TEST(LibConfigTests, ParseInvalidFiles);
   TT_SUITE_TEST(LibConfigTests, ParseInvalidStrings);
+  TT_SUITE_TEST(LibConfigTests, BigInt1);
+  TT_SUITE_TEST(LibConfigTests, BigInt2);
+  TT_SUITE_TEST(LibConfigTests, BigInt3);
+  TT_SUITE_TEST(LibConfigTests, BigInt4);
+  TT_SUITE_TEST(LibConfigTests, BigInt5);
+  TT_SUITE_TEST(LibConfigTests, BigInt6);
+  TT_SUITE_TEST(LibConfigTests, BigInt7);
+  TT_SUITE_TEST(LibConfigTests, RemoveSetting);
+  TT_SUITE_TEST(LibConfigTests, EscapedStrings);
+  TT_SUITE_TEST(LibConfigTests, OverrideSetting);
   TT_SUITE_RUN(LibConfigTests);
+  failures = TT_SUITE_NUM_FAILURES(LibConfigTests);
   TT_SUITE_END(LibConfigTests);
 
-  return(0);
+  if (failures)
+    return EXIT_FAILURE;
+
+  return EXIT_SUCCESS;
 }

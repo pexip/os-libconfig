@@ -1,10 +1,4 @@
 
-lib_LTLIBRARIES = libconfig.la
-
-if BUILDCXX
-lib_LTLIBRARIES += libconfig++.la
-endif
-
 # Versioning rules ( C:R:A )
 #
 # Perform EACH step that applies.
@@ -24,16 +18,18 @@ endif
 #
 # For more info see section 6.3 of the GNU Libtool Manual.
 
-VERINFO = -version-info 11:0:2
+VERINFO = -version-info 12:0:1
 
+## Flex
 PARSER_PREFIX = libconfig_yy
+AM_LFLAGS = --header-file=scanner.h --prefix=$(PARSER_PREFIX)
 
-libconfig_la_LDFLAGS = $(VERINFO) -no-undefined
+## Bison
+AM_YFLAGS = -d -p $(PARSER_PREFIX)
 
-libconfig___la_LDFLAGS = $(VERINFO) -no-undefined
 
-libsrc = libconfig.c scanner.l grammar.y parsectx.h wincompat.h \
-	scanctx.c scanctx.h strbuf.c strbuf.h
+libsrc = grammar.y libconfig.c parsectx.h scanctx.c scanctx.h scanner.l \
+    strbuf.c strbuf.h strvec.c strvec.h util.c util.h wincompat.c wincompat.h
 libinc = libconfig.h
 
 libsrc_cpp =  $(libsrc) libconfigcpp.c++
@@ -41,9 +37,19 @@ libinc_cpp =  libconfig.h++
 
 BUILT_SOURCES = scanner.c scanner.h grammar.c grammar.h
 
+
+## Build mode: C-only or C & C++
+lib_LTLIBRARIES = libconfig.la
+
+if BUILDCXX
+lib_LTLIBRARIES += libconfig++.la
+endif
+
+
 libconfig_la_SOURCES = $(libsrc)
 
 libconfig___la_SOURCES = $(libsrc_cpp)
+
 
 libcppflags = -D_REENTRANT
 libcppxxflags = -D_REENTRANT
@@ -59,17 +65,20 @@ libconfig___la_CPPFLAGS = -DPARSER_PREFIX=\"$(PARSER_PREFIX)\" $(libcppxxflags)
 include_HEADERS = $(libinc)
 
 if BUILDCXX
-include_HEADERS += $(libinc_cpp)
+  include_HEADERS += $(libinc_cpp)
 endif
 
-AM_YFLAGS = -d -p $(PARSER_PREFIX)
 
-AM_LFLAGS = --header-file=scanner.h --prefix=$(PARSER_PREFIX)
+libconfig_la_LDFLAGS = $(VERINFO) -no-undefined
+
+libconfig___la_LDFLAGS = $(VERINFO) -no-undefined
+
 
 EXTRA_DIST = \
 	$(BUILT_SOURCES) \
 	libconfigcpp.cc libconfig.hh \
-	*.vcproj
+	*.vcproj \
+	*.vcxproj
 
 pkgconfigdir = $(libdir)/pkgconfig
 
@@ -77,4 +86,12 @@ pkgconfig_DATA = libconfig.pc
 
 if BUILDCXX
 pkgconfig_DATA += libconfig++.pc
+endif
+
+cmakedir = $(libdir)/cmake/libconfig
+cmake_DATA = libconfigConfig.cmake
+
+if BUILDCXX
+cmakeppdir = $(libdir)/cmake/libconfig++
+cmakepp_DATA = libconfig++Config.cmake
 endif

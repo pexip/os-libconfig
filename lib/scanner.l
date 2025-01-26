@@ -1,7 +1,7 @@
 /* -*- mode: C -*- */
 /* --------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
-   Copyright (C) 2005-2014  Mark A Lindner
+   Copyright (C) 2005-2020  Mark A Lindner
 
    This file is part of libconfig.
 
@@ -39,48 +39,18 @@
 #endif
 
 #include <stdlib.h>
+#include <errno.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
+
 #include "parsectx.h"
 #include "scanctx.h"
 #include "grammar.h"
 #include "wincompat.h"
+#include "util.h"
 
 #define YY_NO_INPUT // Suppress generation of useless input() function
-
-static unsigned long long fromhex(const char *s)
-{
-#ifdef __MINGW32__
-
-  /* MinGW's strtoull() seems to be broken; it only returns the lower
-   * 32 bits...
-   */
-
-  const char *p = s;
-  unsigned long long val = 0;
-
-  if(*p != '0')
-    return(0);
-
-  ++p;
-
-  if(*p != 'x' && *p != 'X')
-    return(0);
-
-  for(++p; isxdigit(*p); ++p)
-  {
-    val <<= 4;
-    val |= ((*p < 'A') ? (*p & 0xF) : (9 + (*p & 0x7)));
-  }
-
-  return(val);
-
-#else /* ! __MINGW32__ */
-
-  return(strtoull(s, NULL, 16));
-
-#endif /* __MINGW32__ */
-}
 
 %}
 
@@ -93,65 +63,66 @@ hex               0[Xx][0-9A-Fa-f]+
 hex64             0[Xx][0-9A-Fa-f]+L(L)?
 hexchar           \\[Xx][0-9A-Fa-f]{2}
 float             ([-+]?([0-9]*)?\.[0-9]*([eE][-+]?[0-9]+)?)|([-+]?([0-9]+)(\.[0-9]*)?[eE][-+]?[0-9]+)
-comment           (#|\/\/).*$
-include_open      ^[ \t]*@include[ \t]+\"
+include_open ^[ \t]*@include[ \t]+\"
 
-%x COMMENT STRING INCLUDE
+%x SINGLE_LINE_COMMENT MULTI_LINE_COMMENT STRING INCLUDE
 
 %%
 
-\/\*              { BEGIN COMMENT; }
-<COMMENT>\*\/     { BEGIN INITIAL; }
-<COMMENT>.        { /* ignore */ }
-<COMMENT>\n       { /* ignore */ }
+(#|\/\/)                     { BEGIN SINGLE_LINE_COMMENT; }
+<SINGLE_LINE_COMMENT>\n      { BEGIN INITIAL; }
+<SINGLE_LINE_COMMENT>.       { /* ignore */ }
+
+\/\*                         { BEGIN MULTI_LINE_COMMENT; }
+<MULTI_LINE_COMMENT>\*\/     { BEGIN INITIAL; }
+<MULTI_LINE_COMMENT>.        { /* ignore */ }
+<MULTI_LINE_COMMENT>\n       { /* ignore */ }
 
 \"                { BEGIN STRING; }
-<STRING>[^\"\\]+  { scanctx_append_string(yyextra, yytext); }
-<STRING>\\n       { scanctx_append_string(yyextra, "\n"); }
-<STRING>\\r       { scanctx_append_string(yyextra, "\r"); }
-<STRING>\\t       { scanctx_append_string(yyextra, "\t"); }
-<STRING>\\f       { scanctx_append_string(yyextra, "\f"); }
-<STRING>\\\\      { scanctx_append_string(yyextra, "\\"); }
-<STRING>\\\"      { scanctx_append_string(yyextra, "\""); }
+<STRING>[^\"\\]+  { libconfig_scanctx_append_string(yyextra, yytext); }
+<STRING>\\n       { libconfig_scanctx_append_char(yyextra, '\n'); }
+<STRING>\\r       { libconfig_scanctx_append_char(yyextra, '\r'); }
+<STRING>\\t       { libconfig_scanctx_append_char(yyextra, '\t'); }
+<STRING>\\f       { libconfig_scanctx_append_char(yyextra, '\f'); }
+<STRING>\\\\      { libconfig_scanctx_append_char(yyextra, '\\'); }
+<STRING>\\\"      { libconfig_scanctx_append_char(yyextra, '\"'); }
 <STRING>{hexchar} {
-                    char c[2] = { (char)(strtol(yytext + 2, NULL, 16) & 0xFF),
-                                  0 };
-                    scanctx_append_string(yyextra, c);
+                    char c = (char)(strtol(yytext + 2, NULL, 16) & 0xFF);
+                    libconfig_scanctx_append_char(yyextra, c);
                   }
-<STRING>\\        { scanctx_append_string(yyextra, "\\"); }
+<STRING>\\        { libconfig_scanctx_append_char(yyextra, '\\'); }
 <STRING>\"        {
-                    yylval->sval = scanctx_take_string(yyextra);
+                    yylval->sval = libconfig_scanctx_take_string(yyextra);
                     BEGIN INITIAL;
                     return(TOK_STRING);
                   }
 
 {include_open}    { BEGIN INCLUDE; }
-<INCLUDE>[^\"\\]+ { scanctx_append_string(yyextra, yytext); }
-<INCLUDE>\\\\     { scanctx_append_string(yyextra, "\\"); }
-<INCLUDE>\\\"     { scanctx_append_string(yyextra, "\""); }
+<INCLUDE>[^\"\\]+ { libconfig_scanctx_append_string(yyextra, yytext); }
+<INCLUDE>\\\\     { libconfig_scanctx_append_char(yyextra, '\\'); }
+<INCLUDE>\\\"     { libconfig_scanctx_append_char(yyextra, '\"'); }
 <INCLUDE>\"       {
-                    const char *error;
-                    FILE *fp = scanctx_push_include(yyextra,
-                                                    (void *)YY_CURRENT_BUFFER,
-                                                    &error);
-                    if(fp)
-                    {
-                      yyin = fp;
-                      yy_switch_to_buffer(
-                        yy_create_buffer(yyin, YY_BUF_SIZE, yyscanner),
+  const char *error = NULL;
+  const char *path = libconfig_scanctx_take_string(yyextra);
+  FILE *fp = libconfig_scanctx_push_include(yyextra, (void *)YY_CURRENT_BUFFER,
+                                            path, &error);
+  __delete(path);
+
+  if(fp)
+  {
+    yyin = fp;
+    yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE, yyscanner),
                         yyscanner);
-                    }
-                    else
-                    {
-                      yyextra->config->error_text = error;
-                      yyextra->config->error_file = scanctx_current_filename(
-                        yyextra);
-                      yyextra->config->error_line = libconfig_yyget_lineno(
-                        yyscanner);
-                      return TOK_ERROR;
-                    }
-                    BEGIN INITIAL;
-                  }
+  }
+  else if(error)
+  {
+    yyextra->config->error_text = error;
+    yyextra->config->error_file = libconfig_scanctx_current_filename(yyextra);
+    yyextra->config->error_line = libconfig_yyget_lineno(yyscanner);
+    return TOK_ERROR;
+  }
+  BEGIN INITIAL;
+}
 
 \n|\r|\f          { /* ignore */ }
 [ \t]+            { /* ignore */ }
@@ -164,29 +135,68 @@ include_open      ^[ \t]*@include[ \t]+\"
 {false}           { yylval->ival = 0; return(TOK_BOOLEAN); }
 {name}            { yylval->sval = yytext; return(TOK_NAME); }
 {float}           { yylval->fval = atof(yytext); return(TOK_FLOAT); }
-{integer}         { yylval->ival = atoi(yytext); return(TOK_INTEGER); }
+{integer}         {
+                    int ok;
+                    long long llval = libconfig_parse_integer(yytext, &ok);
+                    if(!ok)
+                      return(TOK_ERROR);
+
+                    if((llval < INT_MIN) || (llval > INT_MAX))
+                    {
+                      yylval->llval = llval;
+                      return(TOK_INTEGER64);
+                    }
+                    else
+                    {
+                      yylval->ival = (int)llval;
+                      return(TOK_INTEGER);
+                    }
+                  }
 {integer64}       { yylval->llval = atoll(yytext); return(TOK_INTEGER64); }
 {hex}             {
                     yylval->ival = strtoul(yytext, NULL, 16);
                     return(TOK_HEX);
                   }
-{hex64}           { yylval->llval = fromhex(yytext); return(TOK_HEX64); }
+{hex64}           {
+                    yylval->llval = libconfig_parse_hex64(yytext);
+                    return(TOK_HEX64);
+                  }
 \[                { return(TOK_ARRAY_START); }
 \]                { return(TOK_ARRAY_END); }
 \(                { return(TOK_LIST_START); }
 \)                { return(TOK_LIST_END); }
 ;                 { return(TOK_SEMICOLON); }
-{comment}         { /* ignore */ }
 .                 { return(TOK_GARBAGE); }
 
 <<EOF>>           {
-                    YY_BUFFER_STATE buf = (YY_BUFFER_STATE)scanctx_pop_include(
-                      yyextra);
-                    if(buf)
-                    {
-                      yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
-                      yy_switch_to_buffer(buf, yyscanner);
-                    }
-                    else
-                      yyterminate();
-                  }
+  const char *error = NULL;
+  FILE *fp;
+
+  fp = libconfig_scanctx_next_include_file(yyextra, &error);
+  if(fp)
+  {
+    yyin = fp;
+    yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
+    yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE, yyscanner),
+                        yyscanner);
+  }
+  else if(error)
+  {
+    yyextra->config->error_text = error;
+    yyextra->config->error_file = libconfig_scanctx_current_filename(yyextra);
+    yyextra->config->error_line = libconfig_yyget_lineno(yyscanner);
+    return TOK_ERROR;
+  }
+  else
+  {
+    /* No more files in the current include list. */
+    YY_BUFFER_STATE buf = (YY_BUFFER_STATE)libconfig_scanctx_pop_include(yyextra);
+    if(buf)
+    {
+      yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
+      yy_switch_to_buffer(buf, yyscanner);
+    }
+    else
+      yyterminate();
+  }
+}

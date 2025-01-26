@@ -1,4 +1,5 @@
 debian/tmp/usr/include/libconfig.h++
-debian/tmp/usr/lib/*/libconfig++.a
-debian/tmp/usr/lib/*/libconfig++.so
-debian/tmp/usr/lib/*/pkgconfig/libconfig++.pc
+debian/tmp/usr/lib/${DEB_HOST_MULTIARCH}/libconfig++.a
+debian/tmp/usr/lib/${DEB_HOST_MULTIARCH}/libconfig++.so
+debian/tmp/usr/lib/${DEB_HOST_MULTIARCH}/pkgconfig/libconfig++.pc
+debian/tmp/usr/lib/${DEB_HOST_MULTIARCH}/cmake/libconfig++/libconfig++Config.cmake
