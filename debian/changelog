@@ -1,3 +1,37 @@
+libconfig (1.7.3-2) unstable; urgency=medium
+
+  * Upload to unstable
+  * Add patch to fix GNU/Hurd PATH_MAX usage
+
+ -- Mohammed Bilal <rmb@debian.org>  Sun, 26 Jan 2025 15:46:30 +0000
+
+libconfig (1.7.3-1) experimental; urgency=medium
+
+  * Salvage package (Closes: #1037313)
+  * New upstream version 1.7.3 (Closes: #869596)
+  * d/watch : update watch file.
+  * d/rules:
+    - remove dh_makeshlibs override no longer needed
+    - add DEB_BUILD_MAINT_OPTIONS to improve hardening
+    - remove .la files
+  * d/control:
+    - remove compat and replace debhelper build-dep with debhelper-compat = 13
+    - Bump soname to 11
+    - B-D on pkgconf instead of pkg-config
+    - Remove obsolete Breaks/Conflicts/Replaces
+    - Add Rules-Require-Root: no
+    - update Homepage
+    - Bump S-V to 4.7.0
+    - Move Vcs-* fields to salsa
+  * d/libconfig{,++}-dev.install:
+    - install libconfig cmake files (Closes: #904857)
+  * Fix build twice from same source (Closes: #1045447)
+  * d/copyright: update & move to machine readable format
+  * d/salsa-ci.yml enable salsa-ci
+  * d/patches : drop tex-workaround.patch (no longer needed)
+
+ -- Mohammed Bilal <rmb@debian.org>  Tue, 14 Jan 2025 05:08:57 +0000
+
 libconfig (1.5-0.4+pexip24u8) pexip-bookworm; urgency=medium
 
   * New versioning scheme
@@ -240,4 +274,3 @@ libconfig (0.9-1) unstable; urgency=low
   * Initial packaging
 
  -- Jose Luis Tallon <jltallon@adv-solutions.net>  Tue, 10 Oct 2006 01:42:09 +0200
-

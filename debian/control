@@ -2,14 +2,17 @@ Source: libconfig
 Priority: optional
 Section: libs
 Maintainer: Pexip AS <packaging@pexip.com>
-XSBC-Pexip-Original-Maintainer: Jonathan McCrohan <jmccrohan@gmail.com>
-Build-Depends: debhelper (>= 10), texinfo
+XSBC-Pexip-Original-Maintainer: Mohammed Bilal <rmb@debian.org>
+Build-Depends: debhelper-compat (= 13), texinfo
 Build-Depends-Indep: texlive-latex-base, texlive-fonts-recommended
-Standards-Version: 4.1.1
-Homepage: http://www.hyperrealm.com/libconfig/
+Standards-Version: 4.7.0
+Homepage: https://hyperrealm.github.io/libconfig/
+Rules-Requires-Root: no
+Vcs-Git: https://salsa.debian.org/debian/libconfig.git
+Vcs-Browser: https://salsa.debian.org/debian/libconfig
 XS-Pexip-Upstream: http://deb.debian.org/debian/ trixie
 
-Package: libconfig9
+Package: libconfig11
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -23,13 +26,11 @@ Description: parsing/manipulation of structured configuration files
  This library allows parsing, manipulating and writing structured configuration
  files.
 
-Package: libconfig++9v5
+Package: libconfig++11
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Conflicts: libconfig++9
-Replaces: libconfig++9
 Description: parsing/manipulation of structured configuration files (C++ binding)
  This library features a fully reentrant parser and includes bindings for
  both the C and C++ programming languages. It runs on modern POSIX-compliant
@@ -45,9 +46,7 @@ Package: libconfig-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Replaces: libconfig8-dev (<< 1.4.8)
-Breaks: libconfig8-dev (<< 1.4.8)
-Depends: libconfig9 (= ${binary:Version}), pkg-config, ${misc:Depends}
+Depends: libconfig11 (= ${binary:Version}), pkgconf, ${misc:Depends}
 Recommends: libconfig-doc
 Description: parsing/manipulation of structured config files (development)
  This library features a fully reentrant parser and includes bindings for
@@ -71,10 +70,8 @@ Package: libconfig++-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Replaces: libconfig++8-dev (<< 1.4.8)
-Breaks: libconfig++8-dev (<< 1.4.8)
-Depends: libconfig++9v5 (= ${binary:Version}), libconfig-dev,
- pkg-config, ${misc:Depends}
+Depends: libconfig++11 (= ${binary:Version}), libconfig-dev,
+ pkgconf, ${misc:Depends}
 Description: parsing/manipulation of structured config files (C++ development)
  This library features a fully reentrant parser and includes bindings for
  both the C and C++ programming languages. It runs on modern POSIX-compliant
@@ -97,8 +94,6 @@ Package: libconfig-doc
 Section: doc
 Architecture: all
 Multi-Arch: foreign
-Replaces: libconfig-dev (<= 1.4.8)
-Breaks: libconfig-dev (<= 1.4.8)
 Depends: ${misc:Depends}
 Description: parsing/manipulation of structured config files (Documentation)
  This library features a fully reentrant parser and includes bindings for

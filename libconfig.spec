@@ -1,5 +1,5 @@
 Name:		libconfig
-Version:	1.5
+Version:	1.7.3
 Release:	1
 Summary:	C/C++ Configuration File Library
 
@@ -65,12 +65,16 @@ ldconfig
 %{_infodir}
 %{_includedir}
 %{_libdir}/pkgconfig
+%{_libdir}/cmake/libconfig
+%{_libdir}/cmake/libconfig++
 %{_libdir}/%{name}.a
 %{_libdir}/%{name}.la
 %{_libdir}/%{name}++.a
 %{_libdir}/%{name}++.la
 
 %changelog
+* Wed Oct 14 2015  Thomas Fischer  <fischer@unix-ag.uni-kl.de>  1.5
+- added library directory cmake/libconfig and cmake/libconfig++
 * Wed Aug 19 2007  Deneys S. Maartens  <dsm@tlabs.ac.za>  1.1.3-1
 - create spec file
 

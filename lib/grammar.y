@@ -1,7 +1,7 @@
 /* -*- mode: C -*- */
 /* ----------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
-   Copyright (C) 2005-2014  Mark A Lindner
+   Copyright (C) 2005-2018  Mark A Lindner
 
    This file is part of libconfig.
 
@@ -32,28 +32,19 @@
 %{
 #include <string.h>
 #include <stdlib.h>
+
 #include "libconfig.h"
-#ifdef WIN32
-#include "wincompat.h"
-
-/* prevent warnings about redefined malloc/free in generated code: */
-#ifndef _STDLIB_H
-#define _STDLIB_H
-#endif
-
-#include <malloc.h>
-#endif
 #include "parsectx.h"
 #include "scanctx.h"
+#include "util.h"
+#include "wincompat.h"
 
-/* these delcarations are provided to suppress compiler warnings */
+/* These declarations are provided to suppress compiler warnings. */
 extern int libconfig_yylex();
 extern int libconfig_yyget_lineno();
 
 static const char *err_array_elem_type = "mismatched element type in array";
 static const char *err_duplicate_setting = "duplicate setting name";
-
-#define _delete(P) free((void *)(P))
 
 #define IN_ARRAY() \
   (ctx->parent && (ctx->parent->type == CONFIG_TYPE_ARRAY))
@@ -65,7 +56,7 @@ static void capture_parse_pos(void *scanner, struct scan_context *scan_ctx,
                               config_setting_t *setting)
 {
   setting->line = (unsigned int)libconfig_yyget_lineno(scanner);
-  setting->file = scanctx_current_filename(scan_ctx);
+  setting->file = libconfig_scanctx_current_filename(scan_ctx);
 }
 
 #define CAPTURE_PARSE_POS(S) \
@@ -94,6 +85,7 @@ void libconfig_yyerror(void *scanner, struct parse_context *ctx,
 %token <fval> TOK_FLOAT
 %token <sval> TOK_STRING TOK_NAME
 %token TOK_EQUALS TOK_NEWLINE TOK_ARRAY_START TOK_ARRAY_END TOK_LIST_START TOK_LIST_END TOK_COMMA TOK_GROUP_START TOK_GROUP_END TOK_SEMICOLON TOK_GARBAGE TOK_ERROR
+%destructor { free($$); } TOK_STRING
 
 %%
 
@@ -191,8 +183,8 @@ value:
   ;
 
 string:
-  TOK_STRING { parsectx_append_string(ctx, $1); free($1); }
-  | string TOK_STRING { parsectx_append_string(ctx, $2); free($2); }
+  TOK_STRING { libconfig_parsectx_append_string(ctx, $1); free($1); }
+  | string TOK_STRING { libconfig_parsectx_append_string(ctx, $2); free($2); }
   ;
 
 simple_value:
@@ -326,9 +318,9 @@ simple_value:
   {
     if(IN_ARRAY() || IN_LIST())
     {
-      const char *s = parsectx_take_string(ctx);
+      const char *s = libconfig_parsectx_take_string(ctx);
       config_setting_t *e = config_setting_set_string_elem(ctx->parent, -1, s);
-      _delete(s);
+      __delete(s);
 
       if(! e)
       {
@@ -342,9 +334,9 @@ simple_value:
     }
     else
     {
-      const char *s = parsectx_take_string(ctx);
+      const char *s = libconfig_parsectx_take_string(ctx);
       config_setting_set_string(ctx->setting, s);
-      _delete(s);
+      __delete(s);
     }
   }
   ;
@@ -352,6 +344,7 @@ simple_value:
 value_list:
     value
   | value_list TOK_COMMA value
+  | value_list TOK_COMMA
   ;
 
 value_list_optional:
@@ -362,6 +355,7 @@ value_list_optional:
 simple_value_list:
     simple_value
   | simple_value_list TOK_COMMA simple_value
+  | simple_value_list TOK_COMMA
   ;
 
 simple_value_list_optional:

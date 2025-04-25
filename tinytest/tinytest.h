@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------------
    tinytest - A tiny C unit-testing library
-   Copyright (C) 2010-2014  Mark A Lindner
+   Copyright (C) 2010-2018  Mark A Lindner
 
    This file is part of tinytest.
 
@@ -532,5 +532,7 @@ extern void tt_test_ptr(const char *file, int line, const char *aexpr,
 #define TT_SUITE_RUN(S)                         \
   tt_suite_run(__suite__ ## S)
 
+#define TT_SUITE_NUM_FAILURES(S)                \
+  __suite__ ## S->num_failures
 
 #endif // __tinytest_h

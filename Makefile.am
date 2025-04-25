@@ -1,10 +1,18 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib doc tinytest tests
+SUBDIRS = lib
+
+if BUILDDOC
+SUBDIRS += doc
+endif
 
 if BUILDEXAMPLES
 SUBDIRS += examples
+endif
+
+if BUILDTESTS
+SUBDIRS += tinytest tests
 endif
 
 .PHONY: dist-rpm
