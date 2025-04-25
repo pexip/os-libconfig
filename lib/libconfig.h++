@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
-   Copyright (C) 2005-2014  Mark A Lindner
+   Copyright (C) 2005-2018  Mark A Lindner
 
    This file is part of libconfig.
 
@@ -40,8 +40,14 @@
 #endif /* WIN32 */
 
 #define LIBCONFIGXX_VER_MAJOR    1
-#define LIBCONFIGXX_VER_MINOR    5
+#define LIBCONFIGXX_VER_MINOR    7
 #define LIBCONFIGXX_VER_REVISION 0
+
+#if __cplusplus < 201103L
+#define LIBCONFIGXX_NOEXCEPT throw()
+#else
+#define LIBCONFIGXX_NOEXCEPT noexcept
+#endif
 
 struct config_t; // fwd decl
 struct config_setting_t; // fwd decl
@@ -66,11 +72,11 @@ class LIBCONFIGXX_API SettingException : public ConfigException
   SettingException(const SettingException &other);
   SettingException& operator=(const SettingException &other);
 
-  virtual ~SettingException() throw();
+  virtual ~SettingException() LIBCONFIGXX_NOEXCEPT;
 
   const char *getPath() const;
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 
   private:
 
@@ -85,7 +91,7 @@ class LIBCONFIGXX_API SettingTypeException : public SettingException
   SettingTypeException(const Setting &setting, int idx);
   SettingTypeException(const Setting &setting, const char *name);
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 };
 
 class LIBCONFIGXX_API SettingNotFoundException : public SettingException
@@ -96,7 +102,7 @@ class LIBCONFIGXX_API SettingNotFoundException : public SettingException
   SettingNotFoundException(const Setting &setting, int idx);
   SettingNotFoundException(const Setting &setting, const char *name);
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 };
 
 class LIBCONFIGXX_API SettingNameException : public SettingException
@@ -105,14 +111,14 @@ class LIBCONFIGXX_API SettingNameException : public SettingException
 
   SettingNameException(const Setting &setting, const char *name);
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 };
 
 class LIBCONFIGXX_API FileIOException : public ConfigException
 {
   public:
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 };
 
 class LIBCONFIGXX_API ParseException : public ConfigException
@@ -123,7 +129,7 @@ class LIBCONFIGXX_API ParseException : public ConfigException
 
   ParseException(const ParseException &other);
 
-  virtual ~ParseException() throw();
+  virtual ~ParseException() LIBCONFIGXX_NOEXCEPT;
 
   inline const char *getFile() const
   { return(_file); }
@@ -134,7 +140,7 @@ class LIBCONFIGXX_API ParseException : public ConfigException
   inline const char *getError() const
   { return(_error); }
 
-  virtual const char *what() const throw();
+  virtual const char *what() const LIBCONFIGXX_NOEXCEPT;
 
   private:
 
@@ -168,16 +174,6 @@ class LIBCONFIGXX_API Setting
   {
     FormatDefault = 0,
     FormatHex = 1
-  };
-
-  enum Option
-  {
-    OptionNone = 0,
-    OptionAutoConvert = 0x01,
-    OptionSemicolonSeparators = 0x02,
-    OptionColonAssignmentForGroups = 0x04,
-    OptionColonAssignmentForNonGroups = 0x08,
-    OptionOpenBraceOnSeparateLine = 0x10
   };
 
   typedef SettingIterator iterator;
@@ -221,6 +217,10 @@ class LIBCONFIGXX_API Setting
   { return(lookup(path.c_str())); }
 
   Setting & operator[](const char *name) const;
+
+  inline Setting & operator[](const std::string &name) const
+  { return(operator[](name.c_str())); }
+
   Setting & operator[](int index) const;
 
   bool lookupValue(const char *name, bool &value) const;
@@ -309,6 +309,9 @@ class LIBCONFIGXX_API Setting
   {
     return((_type == TypeInt) || (_type == TypeInt64) || (_type == TypeFloat));
   }
+  
+  inline bool isString() const
+  { return(_type == TypeString); }
 
   unsigned int getSourceLine() const;
   const char *getSourceFile() const;
@@ -446,14 +449,34 @@ class LIBCONFIGXX_API Config
 {
   public:
 
+  enum Option
+  {
+    OptionNone = 0,
+    OptionAutoConvert = 0x01,
+    OptionSemicolonSeparators = 0x02,
+    OptionColonAssignmentForGroups = 0x04,
+    OptionColonAssignmentForNonGroups = 0x08,
+    OptionOpenBraceOnSeparateLine = 0x10,
+    OptionAllowScientificNotation = 0x20,
+    OptionFsync = 0x40,
+    OptionAllowOverrides = 0x80
+  };
+
   Config();
   virtual ~Config();
+
+  void clear();
 
   void setOptions(int options);
   int getOptions() const;
 
-  void setAutoConvert(bool flag);
-  bool getAutoConvert() const;
+  void setOption(Config::Option option, bool flag);
+  bool getOption(Config::Option option) const;
+
+  inline void setAutoConvert(bool flag)
+  { setOption(Config::OptionAutoConvert, flag); }
+  inline bool getAutoConvert() const
+  { return(getOption(Config::OptionAutoConvert)); }
 
   void setDefaultFormat(Setting::Format format);
   inline Setting::Format getDefaultFormat() const
@@ -462,8 +485,14 @@ class LIBCONFIGXX_API Config
   void setTabWidth(unsigned short width);
   unsigned short getTabWidth() const;
 
+  void setFloatPrecision(unsigned short digits);
+  unsigned short getFloatPrecision() const;
+
   void setIncludeDir(const char *includeDir);
   const char *getIncludeDir() const;
+
+  virtual const char **evaluateIncludePath(const char *path,
+                                           const char **error);
 
   void read(FILE *stream);
   void write(FILE *stream) const;
@@ -473,7 +502,12 @@ class LIBCONFIGXX_API Config
   { return(readString(str.c_str())); }
 
   void readFile(const char *filename);
+  inline void readFile(const std::string &filename)
+  { readFile(filename.c_str()); }
+
   void writeFile(const char *filename);
+  inline void writeFile(const std::string &filename)
+  { writeFile(filename.c_str()); }
 
   Setting & lookup(const char *path) const;
   inline Setting & lookup(const std::string &path) const
