@@ -1,3 +1,9 @@
+libconfig (1.7.3-2+pexip25u1) pexip-trixie; urgency=medium
+
+  * Initial trixie build
+
+ -- Mark Hymers <mark.hymers@pexip.com>  Tue, 29 Apr 2025 22:35:47 +0100
+
 libconfig (1.7.3-2) unstable; urgency=medium
 
   * Upload to unstable
